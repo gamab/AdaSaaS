@@ -12,6 +12,7 @@
         <title>turtle</title>
         <link rel="stylesheet" type="text/css" href="turtle_style.css">
         <script type="text/javascript" src="turtle_script.js"></script>
+        <script type="text/javascript" src="coding_area.js"></script>
 
         <!--Code mirror-->
         <script src="codemirror-5.8/lib/codemirror.js"></script>
@@ -28,25 +29,7 @@
         <textarea id="output">Output:</textarea>
 
         <script type="text/javascript">
-            var myCodeMirror;
-            function save_text() {
-                myCodeMirror.save();
-                console.log(myCodeMirror.getValue());
-            }
-            function execute_script() {
-                var DSLScript = document.createElement("script");
-                DSLScript.src = "saved_script/saved_script.js";
-                DSLScript.type = "text/javascript";
-                document.body.appendChild(DSLScript);
-                document.body.removeChild(DSLScript);
-            }
-
-            var coding_area = document.getElementById("coding_area");
-
-            myCodeMirror = CodeMirror.fromTextArea(coding_area, {
-                lineNumbers: true
-            });
-            myCodeMirror.setSize(600, 470);
+            init_coding_area();
         </script>
     </body>
 </html>
