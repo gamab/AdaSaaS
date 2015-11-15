@@ -1,0 +1,25 @@
+#coding_frame {
+	width: 600px;
+	height: 500px;
+	border-color: #888888;
+	border-style: solid;
+}
+#turtle {
+	display: block;
+	clear : both;
+	float : right;
+	margin-left: auto;
+	margin-right: auto;
+	border: solid #888888;
+}
+#output {
+	display: block;
+	clear : both;
+	width : 100%;
+	height: 150px;
+	border: solid #888888;
+}
+.btn_img {
+	width: 20px;
+	height: 20px;
+}
