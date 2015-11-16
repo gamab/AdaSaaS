@@ -88,18 +88,25 @@ public class ConsoleHelper implements ConsoleHelperImpl {
 
     @Override
     public ArrayList<String> execute_program(String programName) {
+        System.out.println("ConsoleHelper : executing programm " + programName);
+
         ArrayList<String> result = new ArrayList<>();
+        File dir = new File(clientID);
         Process p;
         try {
-            p = Runtime.getRuntime().exec(programName);
+            p = Runtime.getRuntime().exec(programName,null,dir);
             BufferedReader reader
                     = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            BufferedReader reader_err
+                    = new BufferedReader(new InputStreamReader(p.getErrorStream()));
 
             String line = "";
             while ((line = reader.readLine()) != null) {
                 result.add(line);
             }
-
+            while ((line = reader_err.readLine()) != null) {
+                result.add(line);
+            }
         } catch (IOException ex) {
             System.out.println("ConsoleHelper : Error executing programm " + programName + " " + ex.getMessage());
         }
