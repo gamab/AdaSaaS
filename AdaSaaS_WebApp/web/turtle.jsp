@@ -4,9 +4,30 @@
     Author     : gb
 --%>
 
+<%@page import="System.ConsoleHelper"%>
+<%@page import="java.util.UUID"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
+    <%
+        UUID id = (UUID) session.getAttribute("id");
+        if (id == null) {
+            id = UUID.randomUUID();
+            session.setAttribute("id", id);
+            System.out.println("turle.jsp : " + id.toString());
+        }
+        ConsoleHelper sh = (ConsoleHelper) session.getAttribute("consoleHelper");
+        if (sh == null) {
+            sh = new ConsoleHelper();
+            session.setAttribute("consoleHelper", sh);
+            System.out.println("turtle.jsp : created consoleHelper");
+            if (sh.create_client_folder(id.toString())) {
+                System.out.println("turtle.jsp : created clientFolder");
+            } else {
+                System.out.println("turtle.jsp : error could not create clientFolder");
+            }
+        }
+    %>
     <head>
         <meta http-equiv="content-type" content="text/html; charset=utf-8">
         <title>turtle</title>

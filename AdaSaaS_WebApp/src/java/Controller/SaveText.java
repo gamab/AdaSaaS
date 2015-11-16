@@ -5,13 +5,16 @@
  */
 package Controller;
 
+import System.ConsoleHelper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -44,29 +47,41 @@ public class SaveText extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         boolean save = true;
-        StringBuffer jb = new StringBuffer();
+        ArrayList<String> jb = new ArrayList<String>();
         String line = null;
         try {
-          BufferedReader reader = request.getReader();
-          while ((line = reader.readLine()) != null) {
-            jb.append(line);
-            jb.append('\n');
-          }
+            BufferedReader reader = request.getReader();
+            while ((line = reader.readLine()) != null) {
+                jb.add(line);
+            }
         } catch (Exception e) {
             System.out.println("Save_Text.java : Error " + e.getMessage() + " in doPost");
             save = false;
         }
-        
-        if (save) {
-            System.out.println(jb.toString());
-            response.setContentType("text/html;charset=UTF-8");
 
+        if (save) {
+
+            response.setContentType("text/html;charset=UTF-8");
             try (PrintWriter out = response.getWriter()) {
-                /* TODO output your page here. You may use following sample code. */
-                out.println("SAVED");
+                System.out.println(jb.toString());
+                HttpSession s = request.getSession();
+                ConsoleHelper sh = (ConsoleHelper) s.getAttribute("consoleHelper");
+                if (sh == null) {
+                    out.println("NOT SAVED : Session does not exist.");
+                }
+                else {
+                    if (sh.save_client_file("test.adb", jb)) {
+                        out.println("SAVED");
+                    }
+                    else {
+                        out.println("NOT SAVED : could not save file.");                        
+                    }
+                        
+                }
             }
+
         }
     }
 
