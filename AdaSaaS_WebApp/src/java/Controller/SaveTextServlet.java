@@ -20,7 +20,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author gb
  */
-public class SaveText extends HttpServlet {
+public class SaveTextServlet extends HttpServlet {
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
