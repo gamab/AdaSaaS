@@ -13,6 +13,10 @@
         <servlet-class>Controller.CompileServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>CompileAndSaveServlet</servlet-name>
+        <servlet-class>Controller.CompileAndSaveServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>ExecServlet</servlet-name>
         <servlet-class>Controller.ExecServlet</servlet-class>
     </servlet>
@@ -27,6 +31,10 @@
     <servlet-mapping>
         <servlet-name>CompileServlet</servlet-name>
         <url-pattern>/compile.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>CompileAndSaveServlet</servlet-name>
+        <url-pattern>/compile_and_save.do</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>ExecServlet</servlet-name>
