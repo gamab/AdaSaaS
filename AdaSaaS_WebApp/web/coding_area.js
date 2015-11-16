@@ -31,14 +31,27 @@ function save_text() {
 }
 function execute_script() {
     //reset du caneva
-    turtle_reset();
+    init(600,500);
+    turtle_clear();
 
-    //demande du script
-    var DSLScript = document.createElement("script");
-    DSLScript.src = "get_script.do";
-    DSLScript.type = "text/javascript";
-    document.body.appendChild(DSLScript);
-    document.body.removeChild(DSLScript);
+
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "execute.do", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+            document.getElementById("output").innerHTML = "Output:" + xhr.responseText;
+            
+            //demande du script
+            var DSLScript = document.createElement("script");
+            DSLScript.src = "get_script.do";
+            DSLScript.type = "text/javascript";
+            document.body.appendChild(DSLScript);
+            document.body.removeChild(DSLScript);
+        }
+    }
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.send(null);
+    document.getElementById("output").innerHTML = "Output: Sent compile request";
 }
 function compile() {
     var xhr = new XMLHttpRequest();
@@ -53,5 +66,5 @@ function compile() {
     document.getElementById("output").innerHTML = "Output: Sent compile request";
 }
 function trash() {
-    
+
 }
