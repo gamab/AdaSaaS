@@ -72,7 +72,7 @@ public class SaveTextServlet extends HttpServlet {
                     out.println("NOT SAVED : Session does not exist.");
                 }
                 else {
-                    if (sh.save_client_file("test.adb", jb)) {
+                    if (sh.save_client_file("test_ada.adb", jb)) {
                         out.println("SAVED");
                     }
                     else {
