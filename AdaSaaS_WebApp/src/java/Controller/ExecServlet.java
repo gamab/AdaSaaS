@@ -20,7 +20,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author gb
  */
-public class CompileServlet extends HttpServlet {
+public class ExecServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -35,22 +35,16 @@ public class CompileServlet extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            /* TODO output your page here. You may use following sample code. */
             HttpSession s = request.getSession();
-            System.out.print("compiling client's programm id=");
-            UUID id = ((UUID) s.getAttribute("id"));
+            System.out.print("running client's programm");
             ConsoleHelper sh = (ConsoleHelper) s.getAttribute("consoleHelper");
             if (sh == null) {
                 out.println("ERROR : consoleHelper does not exist in session.");
-
-            } else if (id == null) {
-                out.println("ERROR : id does not exist in session.");
             } else {
-                System.out.println(id);
-                List<String> lines = sh.execute_program("gnatmake " + id.toString() + "/test.adb");
+                String command = "./test_ada ";
+                List<String> lines = sh.execute_program(command);
                 if (lines.isEmpty()) {
-                    out.println("ERROR : No output from gnatmake.");
+                    out.println("No output.");
                 }
                 for (String l : lines) {
                     System.out.println(l);
