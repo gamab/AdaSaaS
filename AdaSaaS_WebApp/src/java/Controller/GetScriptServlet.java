@@ -42,7 +42,7 @@ public class GetScriptServlet extends HttpServlet {
                 out.println("ERROR : Session does not exist.");
             } else {
                 List<String> lines = sh.get_turtle_script("client_turtle_script.js");
-                if (lines.isEmpty()) {
+                if (lines == null) {
                     out.println("ERROR : No graphical output.");
                 }
                 for (String l : lines) {
