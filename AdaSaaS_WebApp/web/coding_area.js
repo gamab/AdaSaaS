@@ -26,7 +26,7 @@ function save_text() {
     }
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhr.send(myCodeMirror.getValue());
-    document.getElementById("output").innerHTML = "Output: Save Request Sent"
+    document.getElementById("output").innerHTML = "Output: Save Request Sent";
     //console.log(myCodeMirror.getValue());
 }
 function execute_script() {
@@ -41,7 +41,16 @@ function execute_script() {
     document.body.removeChild(DSLScript);
 }
 function compile() {
-    
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "compile.do", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+            document.getElementById("output").innerHTML = "Output:" + xhr.responseText;
+        }
+    }
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.send(null);
+    document.getElementById("output").innerHTML = "Output: Sent compile request";
 }
 function trash() {
     

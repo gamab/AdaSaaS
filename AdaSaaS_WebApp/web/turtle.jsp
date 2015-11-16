@@ -16,6 +16,7 @@
             session.setAttribute("id", id);
             System.out.println("turle.jsp : " + id.toString());
         }
+        System.out.println("turle.jsp : " + id.toString());
         ConsoleHelper sh = (ConsoleHelper) session.getAttribute("consoleHelper");
         if (sh == null) {
             sh = new ConsoleHelper();
