@@ -5,9 +5,11 @@
  */
 package System;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
@@ -86,12 +88,33 @@ public class ConsoleHelper implements ConsoleHelperImpl {
 
     @Override
     public ArrayList<String> execute_program(String programName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        ArrayList<String> result = new ArrayList<>();
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec(programName);
+            BufferedReader reader
+                    = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                result.add(line);
+            }
+
+        } catch (IOException ex) {
+            System.out.println("ConsoleHelper : Error executing programm " + programName + " " + ex.getMessage());
+        }
+        return result;
     }
 
     @Override
-    public ArrayList<String> get_turtle_script(String scriptName) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public List<String> get_turtle_script(String scriptName) {
+        List<String> result = null;
+        try {
+            result = Files.readAllLines(Paths.get(clientID + "/" + scriptName));
+        } catch (IOException ex) {
+            System.out.println("ConsoleHelper : Error retrieving client's file " + ex.getMessage());
+        }
+        return result;
     }
 
 }

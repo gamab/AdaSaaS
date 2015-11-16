@@ -23,5 +23,5 @@ public interface ConsoleHelperImpl {
     
     public ArrayList<String> execute_program(String programName);
     
-    public ArrayList<String> get_turtle_script(String scriptName);
+    public List<String> get_turtle_script(String scriptName);
 }
