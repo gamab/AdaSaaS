@@ -40,3 +40,9 @@ function execute_script() {
     document.body.appendChild(DSLScript);
     document.body.removeChild(DSLScript);
 }
+function compile() {
+    
+}
+function trash() {
+    
+}

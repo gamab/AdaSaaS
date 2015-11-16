@@ -44,6 +44,8 @@
         <canvas id="turtle" width="600" height="500" ></canvas> 
         <div id="coding_frame">
             <button onclick="save_text()"><img src="images/save.png" alt="" class="btn_img"></button> 
+            <button onclick="compile()"><img src="images/build.png" alt="" class="btn_img"></button> 
+            <button onclick="trash()"><img src="images/trash.png" alt="" class="btn_img"></button> 
             <button onclick="execute_script()"><img src="images/execute.png" alt="" class="btn_img"></button> 
             <textarea id="coding_area"></textarea>
         </div>
