@@ -20,6 +20,10 @@
         <servlet-name>ExecServlet</servlet-name>
         <servlet-class>Controller.ExecServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>TrashServlet</servlet-name>
+        <servlet-class>Controller.TrashServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>SaveText</servlet-name>
         <url-pattern>/save_text.do</url-pattern>
@@ -39,6 +43,10 @@
     <servlet-mapping>
         <servlet-name>ExecServlet</servlet-name>
         <url-pattern>/execute.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>TrashServlet</servlet-name>
+        <url-pattern>/trash_files.do</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>
