@@ -15,32 +15,19 @@ function init_coding_area() {
     myCodeMirror.setSize(600, 470);
 }
 
-function save_text() {
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "save_text.do", true);
-    myCodeMirror.save();
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState == 4) {
-            document.getElementById("output").innerHTML = "Output:" + xhr.responseText;
-        }
-    }
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.send(myCodeMirror.getValue());
-    document.getElementById("output").innerHTML = "Output: Save Request Sent";
-    //console.log(myCodeMirror.getValue());
-}
 function execute_script() {
     //reset du caneva
-    init(600,500);
+    init(600, 500);
     turtle_clear();
-
 
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "execute.do", true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
-            document.getElementById("output").innerHTML = "Output:" + xhr.responseText;
-            
+            console.log("-----execute_script callback-----");
+            console.log(xhr.responseText);
+            document.getElementById("output").value = "Output:" + xhr.responseText;
+
             //demande du script
             var DSLScript = document.createElement("script");
             DSLScript.src = "get_script.do";
@@ -53,18 +40,31 @@ function execute_script() {
     xhr.send(null);
     document.getElementById("output").innerHTML = "Output: Sent compile request";
 }
-function compile() {
+
+function compileAndSave() {
     var xhr = new XMLHttpRequest();
-    xhr.open("GET", "compile.do", true);
+    xhr.open("POST", "compile_and_save.do", true);
     xhr.onreadystatechange = function () {
         if (xhr.readyState == 4) {
-            document.getElementById("output").innerHTML = "Output:" + xhr.responseText;
+            document.getElementById("output").value = "Output: " + xhr.responseText;
+        }
+    }
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.send(myCodeMirror.getValue());
+    document.getElementById("output").innerHTML = "Output: Sent compile request";
+}
+
+function trash() {
+    var xhr = new XMLHttpRequest();
+    xhr.open("GET", "trash.do", true);
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState == 4) {
+            console.log("-----trash callback-----");
+            console.log(xhr.responseText);
+            document.getElementById("output").value = "Output:" + xhr.responseText;
         }
     }
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhr.send(null);
-    document.getElementById("output").innerHTML = "Output: Sent compile request";
-}
-function trash() {
-
+    document.getElementById("output").innerHTML = "Output: Sent trash request";
 }
