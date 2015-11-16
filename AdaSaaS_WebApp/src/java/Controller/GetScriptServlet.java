@@ -39,11 +39,11 @@ public class GetScriptServlet extends HttpServlet {
             HttpSession s = request.getSession();
             ConsoleHelper sh = (ConsoleHelper) s.getAttribute("consoleHelper");
             if (sh == null) {
-                out.println("ERROR : Session does not exist.");
+                out.println("alert(\"ERROR : Session does not exist.\");");
             } else {
                 List<String> lines = sh.get_turtle_script("client_turtle_script.js");
                 if (lines == null) {
-                    out.println("ERROR : No graphical output.");
+                    out.println("console.log(\"ERROR : No graphical output.\");");
                 }
                 for (String l : lines) {
                     System.out.println(l);
