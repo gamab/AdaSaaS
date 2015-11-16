@@ -5,18 +5,21 @@
  */
 package Controller;
 
+import System.ConsoleHelper;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author gb
  */
-public class GetScript extends HttpServlet {
+public class GetScriptServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,44 +36,20 @@ public class GetScript extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             System.out.println("Sending the client script");
             /* TODO output your page here. You may use following sample code. */
-            out.println("function draw_side(recur, dist) {");
-            out.println("  if (recur==1) {");
-            out.println("    turtle_forward(dist);");
-            out.println("  }");
-            out.println("  else {");
-            out.println("    recur = recur - 1;");
-            out.println("    dist = dist / 3;");
-            out.println("    draw_side(recur,dist);");
-            out.println("    turtle_left(60);");
-            out.println("    draw_side(recur,dist);");
-            out.println("    turtle_right(120);");
-            out.println("    draw_side(recur,dist);");
-            out.println("    turtle_left(60);");
-            out.println("    draw_side(recur,dist);");
-            out.println("  }");
-            out.println("};");
-            out.println("init(600,500);");
-            out.println("turtle_goto(10,60);");
-            out.println("var dist = 200;");
-            out.println("for (i=0; i<3; i++) {");
-            out.println("  draw_side(1,dist);");
-            out.println("  turtle_right(120);");
-            out.println("}");
-            out.println("turtle_goto(375,60);");
-            out.println("for (i=0; i<3; i++) {");
-            out.println("  draw_side(2,dist);");
-            out.println("  turtle_right(120);");
-            out.println("}");
-            out.println("turtle_goto(10,310);");
-            out.println("for (i=0; i<3; i++) {");
-            out.println("  draw_side(3,dist);");
-            out.println("  turtle_right(120);");
-            out.println("}");
-            out.println("turtle_goto(375,310);");
-            out.println("for (i=0; i<3; i++) {");
-            out.println("  draw_side(4,dist);");
-            out.println("  turtle_right(120);");
-            out.println("}");
+            HttpSession s = request.getSession();
+            ConsoleHelper sh = (ConsoleHelper) s.getAttribute("consoleHelper");
+            if (sh == null) {
+                out.println("ERROR : Session does not exist.");
+            } else {
+                List<String> lines = sh.get_turtle_script("client_turtle_script.js");
+                if (lines.isEmpty()) {
+                    out.println("ERROR : No graphical output.");
+                }
+                for (String l : lines) {
+                    System.out.println(l);
+                    out.println(l);
+                }
+            }
 
         }
     }
