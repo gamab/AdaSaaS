@@ -5,6 +5,7 @@
  */
 package Controller;
 
+import System.Cmds;
 import System.ConsoleHelper;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -41,8 +42,8 @@ public class ExecServlet extends HttpServlet {
             if (sh == null) {
                 out.println("ERROR : consoleHelper does not exist in session.");
             } else {
-                String command = "./test_ada ";
-                List<String> lines = sh.execute_program(command);
+                String programName = sh.getClientProgramName();
+                List<String> lines = sh.execute_program(Cmds.cmdExecuteProgram(programName));
                 if (lines.isEmpty()) {
                     out.println("No output.");
                 }
