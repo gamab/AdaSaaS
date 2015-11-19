@@ -16,8 +16,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -27,6 +25,8 @@ import org.apache.commons.io.FileUtils;
 public class ConsoleHelper implements ConsoleHelperImpl {
 
     private String clientID;
+    
+    private String clientProgramName;
 
     @Override
     public boolean create_client_folder(String clientID) {
@@ -122,6 +122,14 @@ public class ConsoleHelper implements ConsoleHelperImpl {
             System.out.println("ConsoleHelper : Error retrieving client's file " + ex.getMessage());
         }
         return result;
+    }
+    
+    public void setClientProgramName(String programName) {
+        this.clientProgramName = programName;
+    }
+    
+    public String getClientProgramName() {
+        return this.clientProgramName;
     }
 
 }
