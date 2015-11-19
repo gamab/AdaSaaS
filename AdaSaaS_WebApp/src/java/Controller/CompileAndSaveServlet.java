@@ -5,12 +5,15 @@
  */
 package Controller;
 
+import System.Cmds;
 import System.ConsoleHelper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +25,22 @@ import javax.servlet.http.HttpSession;
  * @author gb
  */
 public class CompileAndSaveServlet extends HttpServlet {
+
+    protected String retrieveMainProcedureName(String fileLine) {
+        System.out.println("CompileAndSaveServlet : Searching for the main procedure name");
+
+        String fileName = null;
+        Pattern p = Pattern.compile("procedure (.+) is");
+        Matcher m;
+
+        System.out.println(fileLine);
+        m = p.matcher(fileLine);
+        if (m.find()) {
+            fileName = m.group(1);
+        }
+
+        return fileName;
+    }
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -41,15 +60,25 @@ public class CompileAndSaveServlet extends HttpServlet {
             boolean save = true;
             ArrayList<String> jb = new ArrayList<String>();
             String line = null;
+            String fileName = null;
             try {
                 BufferedReader reader = request.getReader();
                 while ((line = reader.readLine()) != null) {
                     jb.add(line);
+                    //Check if the line contains the fileName;
+                    if (fileName == null) {
+                        fileName = retrieveMainProcedureName(line);
+                    }
                 }
             } catch (Exception e) {
                 System.out.println("Save_Text.java : Error " + e.getMessage() + " in doPost");
                 save = false;
             }
+
+            if (fileName == null) {
+                fileName = "test_adb";
+            }
+            System.out.println("CompileAndSaveServlet : File name is : " + fileName);
 
             if (save) {
                 HttpSession s = request.getSession();
@@ -59,23 +88,17 @@ public class CompileAndSaveServlet extends HttpServlet {
                     out.println("ERROR : consoleHelper does not exist in session.");
                 } else {
                     //delete everything except the adb file
-                    String command = "ls -1";
-                    List<String> lines = sh.execute_program(command);
+                    List<String> lines = sh.execute_program(Cmds.cmdListDir());
                     if (!lines.isEmpty()) {
-                        command = "rm ";
-                        for (String l : lines) {
-                            command += l + " ";
-                        }
-                        lines = sh.execute_program(command);
+                        sh.execute_program(Cmds.cmdRemoveFilesInDir(lines));
                     }
 
                     //Save and compile the program into a file
-                    if (sh.save_client_file("test_ada.adb", jb)) {
+                    if (sh.save_client_file(fileName + ".adb", jb)) {
                         out.println("File saved");
 
                         //compile the program
-                        command = "gnatmake -aI../ada_package/ test_ada.adb -aO../ada_package/-o test_ada";
-                        lines = sh.execute_program(command);
+                        lines = sh.execute_program(Cmds.cmdCompileAdbFile(fileName));
                         if (lines.isEmpty()) {
                             out.println("No output from gnatmake.");
                         }
@@ -84,6 +107,7 @@ public class CompileAndSaveServlet extends HttpServlet {
                             System.out.println(l);
                             out.println(l);
                         }
+                        sh.setClientProgramName(fileName);
                     } else {
                         out.println("Could not save file.");
                     }
