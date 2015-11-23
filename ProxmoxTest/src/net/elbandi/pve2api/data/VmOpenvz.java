@@ -295,4 +295,14 @@ public class VmOpenvz {
 	{
 		this.node = node;
 	}
+
+	public void setSwap(long swap) {
+		this.swap = swap;
+	}
+
+	public void setMemory(int memory) {
+		this.memory = memory;
+	}
+	
+	
 }
