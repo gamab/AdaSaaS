@@ -1,4 +1,6 @@
-package adaaas;
+package adaaas.config;
+
+import adaaas.ListWrapper;
 
 public class ConfigEditor implements Runnable {
 	
