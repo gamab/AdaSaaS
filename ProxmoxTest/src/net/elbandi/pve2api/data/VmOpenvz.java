@@ -39,6 +39,7 @@ public class VmOpenvz {
 	private String password;
 	private int vmid;
 	private String node;
+	private String ip;
 
 	public VmOpenvz()
 	{
@@ -48,7 +49,8 @@ public class VmOpenvz {
 	public VmOpenvz(JSONObject data) throws JSONException 
 	{
 		setStandardSettings();
-		
+		ip = data.getString("ip");
+		vmid = (int)data.getInt("vmid");
 		cpu = (float) data.getDouble("cpu");
 		cpus = data.getInt("cpus");
 		disk = (float) data.getDouble("disk");
@@ -303,6 +305,19 @@ public class VmOpenvz {
 	public void setMemory(int memory) {
 		this.memory = memory;
 	}
+
+	@Override
+	public String toString() {
+		return "VmOpenvz [cpu=" + cpu + ", cpus=" + cpus + ", disk=" + disk + ", diskread=" + diskread + ", diskwrite="
+				+ diskwrite + ", maxdisk=" + maxdisk + ", maxmem=" + maxmem + ", maxswap=" + maxswap + ", mem=" + mem
+				+ ", name=" + name + ", netin=" + netin + ", netout=" + netout + ", nproc=" + nproc + ", status="
+				+ status + ", swap=" + swap + ", uptime=" + uptime + ", cpuunits=" + cpuunits + ", digest=" + digest
+				+ ", diskspace=" + diskspace + ", memory=" + memory + ", hostname=" + hostname + ", nameserver="
+				+ nameserver + ", netif=" + netif + ", onboot=" + onboot + ", ostemplate=" + ostemplate + ", quotatime="
+				+ quotatime + ", quotaugidlimit=" + quotaugidlimit + ", searchdomain=" + searchdomain + ", storage="
+				+ storage + ", password=" + password + ", vmid=" + vmid + ", node=" + node + "]";
+	}
+	
 	
 	
 }

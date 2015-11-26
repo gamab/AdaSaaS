@@ -1,5 +1,8 @@
 package proxmox.api;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.elbandi.pve2api.Pve2Api;
 import net.elbandi.pve2api.data.Node;
 import net.elbandi.pve2api.data.VmOpenvz;
@@ -102,6 +105,23 @@ public class API {
 		}
 
 
+	}
+	
+	
+	/**
+	    * Récupère la liste des containers présent dans le datacenter
+	    * Attention il faut avoir le template ubuntu-10.04-standard_10.04-4_i386.tar.gz
+	    *        
+	    * @return la liste en question
+	    */
+	public static List<VmOpenvz> recupererContainers(){
+		try {
+			return api.getOpenvzCTs(mainNode.getName());
+		} catch (Exception e){
+			e.printStackTrace();
+			return new ArrayList<VmOpenvz>();
+		}
+		
 	}
 
 }
