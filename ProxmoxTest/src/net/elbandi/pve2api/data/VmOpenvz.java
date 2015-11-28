@@ -305,6 +305,28 @@ public class VmOpenvz {
 	public void setMemory(int memory) {
 		this.memory = memory;
 	}
+	
+	
+
+	public String getIp() {
+		return ip;
+	}
+
+	public void setIp(String ip) {
+		this.ip = ip;
+	}
+
+	public int getVmid() {
+		return vmid;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
+	public boolean isRunning(){
+		return this.status.equals("running");
+	}
 
 	@Override
 	public String toString() {

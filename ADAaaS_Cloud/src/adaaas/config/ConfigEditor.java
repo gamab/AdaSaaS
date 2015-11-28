@@ -1,17 +1,19 @@
 package adaaas.config;
 
-import adaaas.ListWrapper;
+import java.util.List;
+
+import adaaas.Machine;
 
 public class ConfigEditor implements Runnable {
 	
-	private ListWrapper wrapper;
+	private List <Machine> list;
 	
 	
 	
 	
 
-	public ConfigEditor(ListWrapper wrapper) {
-		this.wrapper = wrapper;
+	public ConfigEditor(List<Machine> wrapper) {
+		this.list = wrapper;
 	}
 
 

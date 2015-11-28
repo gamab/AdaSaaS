@@ -1,6 +1,11 @@
 package adaaas.monitor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.TimerTask;
+
+import adaaas.Machine;
+import proxmox.api.API;
 
 public class MonitoringTask extends TimerTask {
 	
@@ -15,13 +20,35 @@ public class MonitoringTask extends TimerTask {
 	public void run() {
 		System.out.println("Salut poto je suis la routine de monitoring");
 		
-		//TODO Récupérer les containers en fonctionnement
 		
-		//TODO Générer la liste des containers qui sont en bonne santé(selon les critères de monitoring)
+		//On travaille avec la nouvelle liste
+		List<Machine> copie = Monitor.containersToMachine(API.recupererContainers());
+		System.out.println("Nouvelle liste");
 		
-		//TODO Acceder à la liste
+		int nombreMachineEligible = 0;
+		for(Machine m :copie){
+			if (m.updateEligible()){
+				nombreMachineEligible++;
+			}
+		}
+		System.out.println("Nombre de machine eligible : "+nombreMachineEligible);
 		
-		//TODO Faire la différence des deux listes et mettre à jour la liste
+		if (nombreMachineEligible<=1){
+			monitor.deployNew();
+		}
+		
+		//TODO Maintenant il faudrait identifier le moment ou une machine n'a pas de client pour l'éteindre.
+		
+
+		
+	
+		//Mise à jour de la liste
+		monitor.setList(copie);
+		System.out.println("Liste du moniteur");
+		for (Machine m:monitor.getList()){
+			System.out.println(m);
+		}
+		
 		
 		
 	}
