@@ -55,7 +55,7 @@ public class CompileServlet extends HttpServlet {
                 }
 
                 //compile the program
-                lines = sh.execute_program(Cmds.cmdCompileAdbFile(fileName));
+                lines = sh.execute_program(Cmds.cmdCompileAdbFileWEBINF(fileName,s.getServletContext()));
                 if (lines.isEmpty()) {
                     out.println("No output from gnatmake.");
                 }

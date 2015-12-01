@@ -6,6 +6,7 @@
 package System;
 
 import java.util.List;
+import javax.servlet.ServletContext;
 
 /**
  *
@@ -29,7 +30,7 @@ public class Cmds {
         System.out.println("Remove files except : " + adbFileName);
         String command = "rm ";
         for (String l : files) {
-            if (! l.equals(adbFileName+".adb")) {
+            if (!l.equals(adbFileName + ".adb")) {
                 command += l + " ";
             }
         }
@@ -39,6 +40,14 @@ public class Cmds {
     public static String cmdCompileAdbFile(String fileName) {
         String command = "gnatmake -aI../ada_package/ ";
         command += fileName + ".adb -aO../ada_package/ -o ";
+        command += fileName;
+        return command;
+    }
+
+    public static String cmdCompileAdbFileWEBINF(String fileName, ServletContext ctx) {
+        String fullPackagePath = ctx.getRealPath("/WEB-INF/ada_package/");
+        String command = "gnatmake -I"+fullPackagePath+"/ ";
+        command += fileName + ".adb -o ";
         command += fileName;
         return command;
     }
