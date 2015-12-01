@@ -10,18 +10,9 @@ import java.util.Map;
 
 import javax.security.auth.login.LoginException;
 
-import net.elbandi.pve2api.data.AplInfo;
-import net.elbandi.pve2api.data.ClusterLog;
-import net.elbandi.pve2api.data.Network;
-import net.elbandi.pve2api.data.Node;
-import net.elbandi.pve2api.data.Resource;
-import net.elbandi.pve2api.data.Service;
-import net.elbandi.pve2api.data.Storage;
-import net.elbandi.pve2api.data.Task;
-import net.elbandi.pve2api.data.VmOpenvz;
-import net.elbandi.pve2api.data.VmQemu;
-import net.elbandi.pve2api.data.VncData;
+import net.elbandi.pve2api.data.*;
 
+import net.elbandi.pve2api.data.resource.QemuDisk;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -36,6 +27,8 @@ public class Pve2Api {
 	private String pve_login_token;
 	private Date pve_login_ticket_timestamp;
 
+	private static Pve2Api pve2ApiHolder = null;
+
 	public Pve2Api(String pve_hostname, String pve_username, String pve_realm, String pve_password) {
 		this.pve_hostname = pve_hostname;
 		this.pve_username = pve_username;
@@ -43,6 +36,8 @@ public class Pve2Api {
 		this.pve_realm = pve_realm;
 
 		pve_login_ticket_timestamp = null;
+
+		pve2ApiHolder = this;
 	}
 
 	public void login() throws JSONException, LoginException, IOException {
@@ -79,13 +74,12 @@ public class Pve2Api {
 		}
 	}
 
-	private JSONObject pve_action(String Path, RestClient.RequestMethod method,
-			Map<String, String> data) throws JSONException, LoginException, IOException {
+	private JSONObject pve_action(String Path, RestClient.RequestMethod method, Map<String, String> data) throws JSONException, LoginException, IOException 
+	{
 		pve_check_login_ticket();
 		if (!Path.startsWith("/"))
 			Path = "/".concat(Path);
-		RestClient client = new RestClient("https://" + this.pve_hostname + ":8006/api2/json"
-				+ Path);
+		RestClient client = new RestClient("https://" + this.pve_hostname + ":8006/api2/json" + Path);
 		if (!method.equals(RestClient.RequestMethod.GET))
 			client.addHeader("CSRFPreventionToken", pve_login_token);
 		client.addHeader("Cookie", "PVEAuthCookie=" + pve_login_ticket);
@@ -105,6 +99,7 @@ public class Pve2Api {
 			throw new LoginException(client.getErrorMessage());
 		} else if (client.getResponseCode() == HttpURLConnection.HTTP_BAD_REQUEST) {
 			// TODO: find a better exception
+			System.out.println("Response:" + client.getResponse());
 			throw new IOException(client.getErrorMessage());
 		} else {
 			throw new IOException(client.getErrorMessage());
@@ -132,7 +127,11 @@ public class Pve2Api {
 		}
 		return res;
 	}
-
+	/* Returns next free ID */
+	public Integer nextId() throws JSONException, LoginException, IOException {
+		JSONObject jsonObject = pve_action("/cluster/nextid", RestClient.RequestMethod.GET, null);
+		return jsonObject.getInt("data");
+	}
 	public List<Task> getTasks() throws JSONException, LoginException, IOException {
 		List<Task> res = new ArrayList<Task>();
 		JSONObject jObj = pve_action("/cluster/tasks", RestClient.RequestMethod.GET, null);
@@ -147,14 +146,13 @@ public class Pve2Api {
 	// TODO: setOptions
 	// TODO: getClusterStatus
 
-	public List<String> getNodeList() throws JSONException, LoginException, IOException {
-		List<String> res = new ArrayList<String>();
+	public List<Node> getNodeList() throws JSONException, LoginException, IOException {
+		List<Node> res = new ArrayList<Node>();
 		JSONObject jObj = pve_action("/nodes", RestClient.RequestMethod.GET, null);
 		JSONArray data2;
 		data2 = jObj.getJSONArray("data");
 		for (int i = 0; i < data2.length(); i++) {
-			JSONObject row = data2.getJSONObject(i);
-			res.add(row.getString("node"));
+			res.add(getNode(data2.getJSONObject(i).getString("node")));
 		}
 		return res;
 	}
@@ -163,7 +161,7 @@ public class Pve2Api {
 		JSONObject jObj = pve_action("/nodes/" + name + "/status", RestClient.RequestMethod.GET,
 				null);
 		JSONObject data2 = jObj.getJSONObject("data");
-		return new Node(data2);
+		return new Node(name, data2);
 	}
 
 	public List<Service> getNodeServices(String name) throws JSONException, LoginException,
@@ -248,7 +246,25 @@ public class Pve2Api {
 		}
 		return res;
 	}
-
+	public List<Volume> getVolumes(String node, String storage) throws JSONException, LoginException, IOException {
+		List<Volume> volumes = new ArrayList<Volume>();
+		JSONObject jsonObject = pve_action("/nodes/" + node + "/storage/" + storage + "/content", RestClient.RequestMethod.GET, null);
+		JSONArray jsonArray = jsonObject.getJSONArray("data");
+		for (int i = 0; i < jsonArray.length(); i++){
+			volumes.add(new Volume(jsonArray.getJSONObject(i)));
+		}
+		return volumes;
+	}
+	public Volume getVolumeById(String node, String storage, String id) throws JSONException, LoginException, IOException{
+		List<Volume> volumes = getVolumes(node, storage);
+		Volume volumeToReturn = null;
+		for (Volume volume : volumes){
+			if(volume.getVolid().equals(id)){
+				volumeToReturn = volume;
+			}
+		}
+		return volumeToReturn;
+	}
 	public void createStorage(Storage storage) throws LoginException, JSONException, IOException {
 		Map<String, String> data = storage.getCreateParams();
 		pve_action("/storage", RestClient.RequestMethod.POST, data);
@@ -262,30 +278,44 @@ public class Pve2Api {
 	public void deleteStorage(String storage) throws LoginException, JSONException, IOException {
 		pve_action("/storage/" + storage, RestClient.RequestMethod.DELETE, null);
 	}
-
+	public Volume createVolume(String node, String storage, String filename, String size, Integer vmid, String format) throws LoginException, JSONException, IOException, VmQemu.MissingFieldException {
+		Map<String, String> data = new HashMap<String, String>();
+		data.put("filename", filename);
+		data.put("size", size);
+		data.put("vmid", Integer.toString(vmid));
+		data.put("format", format);
+		JSONObject jsonObject = pve_action("/nodes/" + node + "/storage/" + storage + "/content", RestClient.RequestMethod.POST, data);
+		return getVolumeById(node, storage, jsonObject.getString("data"));
+	}
+	public void assignDiskToQemu(int vmid, String node, BlockDevice blockDevice) throws JSONException, LoginException, IOException, VmQemu.MissingFieldException {
+		Map<String, String> data = new HashMap<String, String>();
+		data.put(blockDevice.getBus() + Integer.toString(blockDevice.getDevice()), blockDevice.getCreateString());
+		JSONObject jsonObject = pve_action("/nodes/" + node + "/qemu/" + Integer.toString(vmid) + "/config", RestClient.RequestMethod.PUT, data);
+		System.out.println(jsonObject.toString());
+	}
 	public List<VmQemu> getQemuVMs(String node) throws JSONException, LoginException, IOException {
 		List<VmQemu> res = new ArrayList<VmQemu>();
 		JSONObject jObj = pve_action("/nodes/" + node + "/qemu", RestClient.RequestMethod.GET, null);
 		JSONArray data2 = jObj.getJSONArray("data");
 		for (int i = 0; i < data2.length(); i++) {
-			res.add(new VmQemu(data2.getJSONObject(i)));
+			res.add(getQemuVM(node, data2.getJSONObject(i).getInt("vmid")));
 		}
 		return res;
 	}
 
 	public VmQemu getQemuVM(String node, int vmid) throws JSONException, LoginException,
 			IOException {
-		JSONObject jObj = pve_action("/nodes/" + node + "/qemu/" + vmid + "/status/current",
+		JSONObject jObj = pve_action("/nodes/" + node + "/qemu/" + vmid + "/config",
 				RestClient.RequestMethod.GET, null);
-		return new VmQemu(jObj.getJSONObject("data"));
+		return new VmQemu(getNode(node), vmid, jObj.getJSONObject("data"));
 	}
 
-	public void getQemuConfig(String node, int vmid, VmQemu vm) throws JSONException,
+	/*public void getQemuConfig(String node, int vmid, VmQemu vm) throws JSONException,
 			LoginException, IOException {
 		JSONObject jObj = pve_action("/nodes/" + node + "/qemu/" + vmid + "/config",
 				RestClient.RequestMethod.GET, null);
 		vm.SetConfig(jObj.getJSONObject("data"));
-	}
+	}*/
 
 	public String startQemu(String node, int vmid) throws LoginException, JSONException,
 			IOException {
@@ -332,7 +362,15 @@ public class Pve2Api {
 		return jObj.getString("data");
 	}
 
-	// TODO: QemuCreate(String node, int vmid, params)
+	public String createQemu(VmQemu vm) throws LoginException, JSONException, IOException, VmQemu.DeviceException, VmQemu.MissingFieldException {
+		Map<String, String> params = vm.toMap(); //adding this to make it throw MissingFieldException right now in case node is not specified
+		JSONObject jsonObject = pve_action("/nodes/" + vm.getNode().getName() + "/qemu", RestClient.RequestMethod.POST, vm.toMap());
+		return jsonObject.getString("data");
+	}
+
+	public void updateQemu(VmQemu vm) throws LoginException, JSONException, IOException, VmQemu.DeviceException, VmQemu.MissingFieldException {
+		pve_action("/nodes/" + vm.getNode().getName() + "/qemu/" + vm.getVmid() + "/config", RestClient.RequestMethod.PUT, vm.toUpdateMap());
+	}
 	// TODO: QemuUpdate(String node, int vmid, params) PUT
 
 	protected String deleteQemu(String node, int vmid) throws LoginException, JSONException,
@@ -454,13 +492,20 @@ public class Pve2Api {
 				RestClient.RequestMethod.POST, new PveParams("command", command));
 		return jObj.getString("data");
 	}
-
+	public String rollbackQemu(String node, int vmid, String snapname) throws LoginException,
+	            JSONException, IOException {
+		        JSONObject jObj = pve_action("/nodes/" + node + "/qemu/" + vmid + "/snapshot/" + snapname + "/rollback",
+				                RestClient.RequestMethod.POST, null);
+		        return jObj.getString("data");
+	}
 	public List<VmOpenvz> getOpenvzCTs(String node) throws JSONException, LoginException,
 			IOException {
 		List<VmOpenvz> res = new ArrayList<VmOpenvz>();
 		JSONObject jObj = pve_action("/nodes/" + node + "/openvz", RestClient.RequestMethod.GET,
 				null);
+//		System.out.println(jObj.toString());
 		JSONArray data2 = jObj.getJSONArray("data");
+		System.out.println(data2.toString());
 		for (int i = 0; i < data2.length(); i++) {
 			res.add(new VmOpenvz(data2.getJSONObject(i)));
 		}
@@ -471,6 +516,7 @@ public class Pve2Api {
 			IOException {
 		JSONObject jObj = pve_action("/nodes/" + node + "/openvz/" + vmid + "/status/current",
 				RestClient.RequestMethod.GET, null);
+		System.out.println(jObj);
 		return new VmOpenvz(jObj.getJSONObject("data"));
 	}
 
@@ -478,11 +524,29 @@ public class Pve2Api {
 			LoginException, IOException {
 		JSONObject jObj = pve_action("/nodes/" + node + "/openvz/" + vmid + "/config",
 				RestClient.RequestMethod.GET, null);
+		System.out.println(jObj);
 		vm.SetConfig(jObj.getJSONObject("data"));
 	}
-
-	// TODO: createOpenvz
-	// TODO: updateOpenvz
+	
+	
+	public String createOpenvz(VmOpenvz vm) throws LoginException, JSONException, IOException 
+	{
+		return createOpenvz(vm.getNode(), vm);
+	}
+	
+	public String createOpenvz(String node, VmOpenvz vm) throws LoginException, JSONException, IOException 
+	{
+		Map<String, String> parameterData = vm.getCreateParams();
+		System.out.println(parameterData.toString());
+		String path = "/nodes/" + node + "/openvz";
+		JSONObject jsonObject = pve_action(path, RestClient.RequestMethod.POST, parameterData);
+		return jsonObject.getString("data");
+	}
+	
+	public String updateOpenvz(String node, VmOpenvz vm) throws LoginException, JSONException, IOException 
+	{
+		return createOpenvz(node, vm);
+	}
 
 	protected Map<Integer, String> initlogOpenvz(String node, int vmid, Map<String, String> data)
 			throws LoginException, JSONException, IOException {
@@ -633,5 +697,9 @@ public class Pve2Api {
 			put(key, value ? "1" : "0");
 			return this;
 		}
+	}
+
+	public static Pve2Api getPve2Api() {
+		return pve2ApiHolder;
 	}
 }
