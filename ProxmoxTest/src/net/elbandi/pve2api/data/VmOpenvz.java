@@ -119,6 +119,7 @@ public class VmOpenvz {
 		quotaugidlimit = data.getInt("quotaugidlimit");
 		searchdomain = data.getString("searchdomain");
 		storage = data.getString("storage");
+		ip=data.getString("ip_address");
 	}
 	
 	public Map<String, String> getCreateParams()
@@ -324,6 +325,14 @@ public class VmOpenvz {
 		this.name = name;
 	}
 	
+	public void setHostname(String hostname){
+		this.hostname=hostname;
+	}
+	
+	public void setNetif(String netif){
+		this.netif = netif;
+	}
+	
 	public boolean isRunning(){
 		return this.status.equals("running");
 	}
@@ -337,8 +346,10 @@ public class VmOpenvz {
 				+ ", diskspace=" + diskspace + ", memory=" + memory + ", hostname=" + hostname + ", nameserver="
 				+ nameserver + ", netif=" + netif + ", onboot=" + onboot + ", ostemplate=" + ostemplate + ", quotatime="
 				+ quotatime + ", quotaugidlimit=" + quotaugidlimit + ", searchdomain=" + searchdomain + ", storage="
-				+ storage + ", password=" + password + ", vmid=" + vmid + ", node=" + node + "]";
+				+ storage + ", password=" + password + ", vmid=" + vmid + ", node=" + node + ", ip=" + ip + "]";
 	}
+
+
 	
 	
 	

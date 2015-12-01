@@ -18,8 +18,8 @@ import net.elbandi.pve2api.data.VmOpenvz;
 
 public class API {
 
-	private static Pve2Api api; 
-	private static Node mainNode;
+	public static Pve2Api api; 
+	public static Node mainNode;
 
 /**
     * Permet d'initialiser la connexion
@@ -43,6 +43,29 @@ public class API {
 
 
 	}
+	
+	/**
+	    * Permet d'initialiser la connexion en root
+	    * @param login
+	    *            Votre login
+	    * @param pw
+	    * 			Votre mot de passe           
+	    * @return true si ça s'est bien passé
+	    */
+		
+		public static boolean authRoot(String login, String pw){
+			try {
+				api = new Pve2Api("149.202.70.59", login, "pam", pw);
+				api.login();
+				mainNode = api.getNodeList().get(0);
+				return true;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+
+
+		}
 	
 	/**
 	    * Démarre un container
@@ -120,6 +143,17 @@ public class API {
 		} catch (Exception e){
 			e.printStackTrace();
 			return new ArrayList<VmOpenvz>();
+		}
+		
+	}
+	
+	//TODO a completer creation + ajout de l'adresse IP
+	public static void creerContainer(VmOpenvz vm){
+		try {
+			vm.setNode(mainNode.getName());
+			api.createOpenvz(vm);
+		} catch (Exception e){
+			e.printStackTrace();
 		}
 		
 	}
