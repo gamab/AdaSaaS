@@ -20,9 +20,11 @@ function execute_script() {
     init(600, 500);
     turtle_clear();
 
+    console.log('Execute_Script');
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "execute.do", true);
     xhr.onreadystatechange = function () {
+        console.log(xhr.readyState);
         if (xhr.readyState == 4) {
             console.log("-----execute_script callback-----");
             console.log(xhr.responseText);
@@ -37,27 +39,61 @@ function execute_script() {
         }
     }
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
     xhr.send(null);
     document.getElementById("output").innerHTML = "Output: Sent compile request";
 }
 
 function compileAndSave() {
+    console.log('Compile and Save');
     var xhr = new XMLHttpRequest();
     xhr.open("POST", "compile_and_save.do", true);
     xhr.onreadystatechange = function () {
+        console.log(xhr.readyState);
         if (xhr.readyState == 4) {
             document.getElementById("output").value = "Output: " + xhr.responseText;
         }
     }
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+    xhr.send(myCodeMirror.getValue());
+    document.getElementById("output").innerHTML = "Output: Sent compile request";
+}
+
+function compileAndSave2() {
+    console.log('Compile and Save');
+    var xhr = new XMLHttpRequest();
+    xhr.open("POST", "../save_text.do", true);
+    xhr.onreadystatechange = function () {
+        console.log(xhr.readyState);
+        if (xhr.readyState == 4) {
+            document.getElementById("output").value = "Output: " + xhr.responseText;
+
+            var xhr2 = new XMLHttpRequest();
+            xhr2.open("Get", "compile.do", true);
+            xhr2.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+            xhr2.send(null);
+            xhr2.onreadystatechange = function () {
+                console.log(xhr2.readyState);
+                if (xhr2.readyState == 4) {
+                    document.getElementById("output").value = "Output: " + xhr2.responseText;
+                }
+            }
+
+        }
+    }
+    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
     xhr.send(myCodeMirror.getValue());
     document.getElementById("output").innerHTML = "Output: Sent compile request";
 }
 
 function trash() {
+    console.log('Trash');
     var xhr = new XMLHttpRequest();
     xhr.open("GET", "trash_files.do", true);
     xhr.onreadystatechange = function () {
+        console.log(xhr.readyState);
         if (xhr.readyState == 4) {
             console.log("-----trash callback-----");
             console.log(xhr.responseText);
@@ -65,6 +101,7 @@ function trash() {
         }
     }
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+    xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
     xhr.send(null);
     document.getElementById("output").innerHTML = "Output: Sent trash request";
 }

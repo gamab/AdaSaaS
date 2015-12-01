@@ -32,6 +32,7 @@ public class GetScriptServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        System.out.println("GetScriptServlet");
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             System.out.println("Sending the client script");
@@ -44,10 +45,11 @@ public class GetScriptServlet extends HttpServlet {
                 List<String> lines = sh.get_turtle_script("client_turtle_script.js");
                 if (lines == null) {
                     out.println("console.log(\"ERROR : No graphical output.\");");
-                }
-                for (String l : lines) {
-                    System.out.println(l);
-                    out.println(l);
+                } else {
+                    for (String l : lines) {
+                        System.out.println(l);
+                        out.println(l);
+                    }
                 }
             }
 

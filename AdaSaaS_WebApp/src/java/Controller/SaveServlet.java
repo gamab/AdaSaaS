@@ -24,7 +24,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author gb
  */
-public class CompileAndSaveServlet extends HttpServlet {
+public class SaveServlet extends HttpServlet {
 
     protected String retrieveMainProcedureName(String fileLine) {
         System.out.println("CompileAndSaveServlet : Searching for the main procedure name");
@@ -54,6 +54,7 @@ public class CompileAndSaveServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        System.out.println("SaveServlet");
         try (PrintWriter out = response.getWriter()) {
 
             //first we read the file to compile from the request
@@ -78,7 +79,7 @@ public class CompileAndSaveServlet extends HttpServlet {
             if (fileName == null) {
                 fileName = "test_adb";
             }
-            System.out.println("CompileAndSaveServlet : File name is : " + fileName);
+            System.out.println("SaveServlet : File name is : " + fileName);
 
             if (save) {
                 HttpSession s = request.getSession();
@@ -96,17 +97,7 @@ public class CompileAndSaveServlet extends HttpServlet {
                     //Save and compile the program into a file
                     if (sh.save_client_file(fileName + ".adb", jb)) {
                         out.println("File saved");
-
-                        //compile the program
-                        lines = sh.execute_program(Cmds.cmdCompileAdbFile(fileName));
-                        if (lines.isEmpty()) {
-                            out.println("No output from gnatmake.");
-                        }
-                        //print the output to the client
-                        for (String l : lines) {
-                            System.out.println(l);
-                            out.println(l);
-                        }
+                                                
                         sh.setClientProgramName(fileName);
                     } else {
                         out.println("Could not save file.");

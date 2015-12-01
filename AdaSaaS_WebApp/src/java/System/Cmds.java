@@ -25,6 +25,17 @@ public class Cmds {
         return command;
     }
 
+    public static String cmdRemoveFilesInDirExceptAdb(List<String> files, String adbFileName) {
+        System.out.println("Remove files except : " + adbFileName);
+        String command = "rm ";
+        for (String l : files) {
+            if (! l.equals(adbFileName+".adb")) {
+                command += l + " ";
+            }
+        }
+        return command;
+    }
+
     public static String cmdCompileAdbFile(String fileName) {
         String command = "gnatmake -aI../ada_package/ ";
         command += fileName + ".adb -aO../ada_package/ -o ";
@@ -33,7 +44,7 @@ public class Cmds {
     }
 
     public static String cmdExecuteProgram(String program) {
-        String command = "./"+program;
+        String command = "./" + program;
         return command;
     }
 }

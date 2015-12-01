@@ -24,23 +24,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author gb
  */
-public class CompileAndSaveServlet extends HttpServlet {
-
-    protected String retrieveMainProcedureName(String fileLine) {
-        System.out.println("CompileAndSaveServlet : Searching for the main procedure name");
-
-        String fileName = null;
-        Pattern p = Pattern.compile("procedure (.+) is");
-        Matcher m;
-
-        System.out.println(fileLine);
-        m = p.matcher(fileLine);
-        if (m.find()) {
-            fileName = m.group(1);
-        }
-
-        return fileName;
-    }
+public class CompileServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -54,66 +38,33 @@ public class CompileAndSaveServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        System.out.println("CompileServlet");
         try (PrintWriter out = response.getWriter()) {
 
-            //first we read the file to compile from the request
-            boolean save = true;
-            ArrayList<String> jb = new ArrayList<String>();
-            String line = null;
-            String fileName = null;
-            try {
-                BufferedReader reader = request.getReader();
-                while ((line = reader.readLine()) != null) {
-                    jb.add(line);
-                    //Check if the line contains the fileName;
-                    if (fileName == null) {
-                        fileName = retrieveMainProcedureName(line);
-                    }
-                }
-            } catch (Exception e) {
-                System.out.println("Save_Text.java : Error " + e.getMessage() + " in doPost");
-                save = false;
-            }
-
-            if (fileName == null) {
-                fileName = "test_adb";
-            }
-            System.out.println("CompileAndSaveServlet : File name is : " + fileName);
-
-            if (save) {
-                HttpSession s = request.getSession();
-                System.out.print("saving and compiling client's programm");
-                ConsoleHelper sh = (ConsoleHelper) s.getAttribute("consoleHelper");
-                if (sh == null) {
-                    out.println("ERROR : consoleHelper does not exist in session.");
-                } else {
-                    //delete everything except the adb file
-                    List<String> lines = sh.execute_program(Cmds.cmdListDir());
-                    if (!lines.isEmpty()) {
-                        sh.execute_program(Cmds.cmdRemoveFilesInDir(lines));
-                    }
-
-                    //Save and compile the program into a file
-                    if (sh.save_client_file(fileName + ".adb", jb)) {
-                        out.println("File saved");
-
-                        //compile the program
-                        lines = sh.execute_program(Cmds.cmdCompileAdbFile(fileName));
-                        if (lines.isEmpty()) {
-                            out.println("No output from gnatmake.");
-                        }
-                        //print the output to the client
-                        for (String l : lines) {
-                            System.out.println(l);
-                            out.println(l);
-                        }
-                        sh.setClientProgramName(fileName);
-                    } else {
-                        out.println("Could not save file.");
-                    }
-                }
+            HttpSession s = request.getSession();
+            System.out.println("CompileServlet : Compiling client's programm");
+            ConsoleHelper sh = (ConsoleHelper) s.getAttribute("consoleHelper");
+            if (sh == null) {
+                out.println("ERROR : consoleHelper does not exist in session.");
             } else {
-                out.println("Did not find anything to compile.");
+                //delete everything except the adb file
+                String fileName = sh.getClientProgramName();
+                List<String> lines = sh.execute_program(Cmds.cmdListDir());
+                if (!lines.isEmpty()) {
+                    sh.execute_program(Cmds.cmdRemoveFilesInDirExceptAdb(lines,fileName));
+                }
+
+                //compile the program
+                lines = sh.execute_program(Cmds.cmdCompileAdbFile(fileName));
+                if (lines.isEmpty()) {
+                    out.println("No output from gnatmake.");
+                }
+                //print the output to the client
+                for (String l : lines) {
+                    System.out.println(l);
+                    out.println(l);
+                }
+                sh.setClientProgramName(fileName);
             }
         }
     }
@@ -130,7 +81,7 @@ public class CompileAndSaveServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //processRequest(request, response);
+        processRequest(request, response);
     }
 
     /**
@@ -144,7 +95,7 @@ public class CompileAndSaveServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        //processRequest(request, response);
     }
 
     /**

@@ -54,6 +54,7 @@ public class CompileAndSaveServlet extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
+        System.out.println("CompileAndSaveServlet");
         try (PrintWriter out = response.getWriter()) {
 
             //first we read the file to compile from the request
