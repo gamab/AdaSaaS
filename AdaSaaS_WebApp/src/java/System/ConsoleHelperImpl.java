@@ -13,15 +13,17 @@ import java.util.List;
  * @author gb
  */
 public interface ConsoleHelperImpl {
-    public boolean create_client_folder(String clientID);
+    public boolean createClientFolder(String clientID);
     
-    public boolean delete_client_folder();
+    public boolean deleteClientFolder();
     
-    public boolean save_client_file(String fileName, ArrayList<String> lines);
+    public boolean saveClientFile(String fileName, ArrayList<String> lines);
     
-    public List<String> get_client_file(String fileName);
+    public List<String> getClientFile(String fileName);
     
-    public ArrayList<String> execute_program(String programName);
+    public ArrayList<String> executeProgram(String programName);
     
-    public List<String> get_turtle_script(String scriptName);
+    public ArrayList<String> executeProgramThread(String programName);
+    
+    public List<String> getTurtleScript(String scriptName);
 }

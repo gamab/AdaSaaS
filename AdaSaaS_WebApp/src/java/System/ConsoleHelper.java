@@ -29,7 +29,7 @@ public class ConsoleHelper implements ConsoleHelperImpl {
     private String clientProgramName;
 
     @Override
-    public boolean create_client_folder(String clientID) {
+    public boolean createClientFolder(String clientID) {
         this.clientID = clientID;
         File dir = new File(clientID);
         boolean created = dir.mkdir();
@@ -39,7 +39,7 @@ public class ConsoleHelper implements ConsoleHelperImpl {
     }
 
     @Override
-    public boolean delete_client_folder() {
+    public boolean deleteClientFolder() {
         File dir = new File(clientID);
         boolean delete = true;
         try {
@@ -52,7 +52,7 @@ public class ConsoleHelper implements ConsoleHelperImpl {
     }
 
     @Override
-    public boolean save_client_file(String fileName, ArrayList<String> lines) {
+    public boolean saveClientFile(String fileName, ArrayList<String> lines) {
         PrintWriter writer = null;
         boolean saved = true;
         try {
@@ -76,7 +76,7 @@ public class ConsoleHelper implements ConsoleHelperImpl {
     }
 
     @Override
-    public List<String> get_client_file(String fileName) {
+    public List<String> getClientFile(String fileName) {
         List<String> result = null;
         try {
             result = Files.readAllLines(Paths.get(clientID + "/" + fileName));
@@ -87,7 +87,7 @@ public class ConsoleHelper implements ConsoleHelperImpl {
     }
 
     @Override
-    public ArrayList<String> execute_program(String programName) {
+    public ArrayList<String> executeProgram(String programName) {
         System.out.println("ConsoleHelper : executing programm " + programName);
 
         ArrayList<String> result = new ArrayList<>();
@@ -114,7 +114,34 @@ public class ConsoleHelper implements ConsoleHelperImpl {
     }
 
     @Override
-    public List<String> get_turtle_script(String scriptName) {
+    public ArrayList<String> executeProgramThread(String programName) {
+        System.out.println("ConsoleHelper : executing programm in a thread" + programName);
+
+        ArrayList<String> result = new ArrayList<>();
+        File dir = new File(clientID);
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec(programName,null,dir);
+            BufferedReader reader
+                    = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            BufferedReader reader_err
+                    = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                result.add(line);
+            }
+            while ((line = reader_err.readLine()) != null) {
+                result.add(line);
+            }
+        } catch (IOException ex) {
+            System.out.println("ConsoleHelper : Error executing programm " + programName + " " + ex.getMessage());
+        }
+        return result;
+    }
+
+    @Override
+    public List<String> getTurtleScript(String scriptName) {
         List<String> result = null;
         try {
             result = Files.readAllLines(Paths.get(clientID + "/" + scriptName));

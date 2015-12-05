@@ -44,7 +44,7 @@ public class ExecServlet extends HttpServlet {
                 out.println("ERROR : consoleHelper does not exist in session.");
             } else {
                 String programName = sh.getClientProgramName();
-                List<String> lines = sh.execute_program(Cmds.cmdExecuteProgram(programName));
+                List<String> lines = sh.executeProgram(Cmds.cmdExecuteProgram(programName));
                 if (lines.isEmpty()) {
                     out.println("No output.");
                 }

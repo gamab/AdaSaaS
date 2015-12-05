@@ -48,7 +48,7 @@ public class TrashServlet extends HttpServlet {
                 out.println("Session ended");
                 
                 //deleting the repo
-                if (sh.delete_client_folder()) {
+                if (sh.deleteClientFolder()) {
                     out.println("Repository deleted");
                 } else {
                     out.println("Could not delete repository");                    

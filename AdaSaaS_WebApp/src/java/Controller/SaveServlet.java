@@ -89,13 +89,13 @@ public class SaveServlet extends HttpServlet {
                     out.println("ERROR : consoleHelper does not exist in session.");
                 } else {
                     //delete everything except the adb file
-                    List<String> lines = sh.execute_program(Cmds.cmdListDir());
+                    List<String> lines = sh.executeProgram(Cmds.cmdListDir());
                     if (!lines.isEmpty()) {
-                        sh.execute_program(Cmds.cmdRemoveFilesInDir(lines));
+                        sh.executeProgram(Cmds.cmdRemoveFilesInDir(lines));
                     }
 
                     //Save and compile the program into a file
-                    if (sh.save_client_file(fileName + ".adb", jb)) {
+                    if (sh.saveClientFile(fileName + ".adb", jb)) {
                         out.println("File saved");
                                                 
                         sh.setClientProgramName(fileName);

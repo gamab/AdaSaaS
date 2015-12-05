@@ -22,7 +22,7 @@
             sh = new ConsoleHelper();
             session.setAttribute("consoleHelper", sh);
             System.out.println("turtle.jsp : created consoleHelper");
-            if (sh.create_client_folder(id.toString())) {
+            if (sh.createClientFolder(id.toString())) {
                 System.out.println("turtle.jsp : created clientFolder");
             } else {
                 System.out.println("turtle.jsp : error could not create clientFolder");
