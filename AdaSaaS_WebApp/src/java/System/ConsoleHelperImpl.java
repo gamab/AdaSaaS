@@ -23,7 +23,7 @@ public interface ConsoleHelperImpl {
     
     public ArrayList<String> executeProgram(String programName);
     
-    public ArrayList<String> executeProgramThread(String programName);
+    /*public ArrayList<String> executeProgramThread(String programName);*/
     
     public List<String> getTurtleScript(String scriptName);
 }
