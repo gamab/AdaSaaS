@@ -16,6 +16,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -24,8 +27,10 @@ import org.apache.commons.io.FileUtils;
  */
 public class ConsoleHelper implements ConsoleHelperImpl {
 
-    private String clientID;
+    private static int timeout = 30;
     
+    private String clientID;
+
     private String clientProgramName;
 
     @Override
@@ -86,6 +91,33 @@ public class ConsoleHelper implements ConsoleHelperImpl {
         return result;
     }
 
+    /*@Override
+    public ArrayList<String> executeProgram(String programName) {
+        System.out.println("ConsoleHelper : executing programm " + programName);
+
+        ArrayList<String> result = new ArrayList<>();
+        File dir = new File(clientID);
+        Process p;
+        try {
+            p = Runtime.getRuntime().exec(programName, null, dir);
+            BufferedReader reader
+                    = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            BufferedReader reader_err
+                    = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+            String line = "";
+            while ((line = reader.readLine()) != null) {
+                result.add(line);
+            }
+            while ((line = reader_err.readLine()) != null) {
+                result.add(line);
+            }
+        } catch (IOException ex) {
+            System.out.println("ConsoleHelper : Error executing programm " + programName + " " + ex.getMessage());
+        }
+        return result;
+    }*/
+
     @Override
     public ArrayList<String> executeProgram(String programName) {
         System.out.println("ConsoleHelper : executing programm " + programName);
@@ -94,54 +126,39 @@ public class ConsoleHelper implements ConsoleHelperImpl {
         File dir = new File(clientID);
         Process p;
         try {
-            p = Runtime.getRuntime().exec(programName,null,dir);
-            BufferedReader reader
-                    = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            BufferedReader reader_err
-                    = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+            p = Runtime.getRuntime().exec(programName, null, dir);
 
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                result.add(line);
+            if (!p.waitFor(timeout, TimeUnit.SECONDS)) {
+                System.out.println("ConsoleHelper : timeout");
+                result.add("Program timed out after " + timeout + "seconds.\nYou probably have an infinite loop.");
+                //timeout
+                p.destroy();
             }
-            while ((line = reader_err.readLine()) != null) {
-                result.add(line);
+            else {
+                BufferedReader reader
+                        = new BufferedReader(new InputStreamReader(p.getInputStream()));
+                BufferedReader reader_err
+                        = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+                String line = "";
+                while ((line = reader.readLine()) != null) {
+                    result.add(line);
+                }
+                while ((line = reader_err.readLine()) != null) {
+                    result.add(line);
+                }
             }
         } catch (IOException ex) {
             System.out.println("ConsoleHelper : Error executing programm " + programName + " " + ex.getMessage());
+        } catch (InterruptedException ex) {
+            System.out.println("ConsoleHelper : Error executing programm " + programName + " timeout : " + ex.getMessage());
         }
         return result;
     }
 
     @Override
-    public ArrayList<String> executeProgramThread(String programName) {
-        System.out.println("ConsoleHelper : executing programm in a thread" + programName);
-
-        ArrayList<String> result = new ArrayList<>();
-        File dir = new File(clientID);
-        Process p;
-        try {
-            p = Runtime.getRuntime().exec(programName,null,dir);
-            BufferedReader reader
-                    = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            BufferedReader reader_err
-                    = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-
-            String line = "";
-            while ((line = reader.readLine()) != null) {
-                result.add(line);
-            }
-            while ((line = reader_err.readLine()) != null) {
-                result.add(line);
-            }
-        } catch (IOException ex) {
-            System.out.println("ConsoleHelper : Error executing programm " + programName + " " + ex.getMessage());
-        }
-        return result;
-    }
-
-    @Override
-    public List<String> getTurtleScript(String scriptName) {
+    public List<String> getTurtleScript(String scriptName
+    ) {
         List<String> result = null;
         try {
             result = Files.readAllLines(Paths.get(clientID + "/" + scriptName));
@@ -150,11 +167,11 @@ public class ConsoleHelper implements ConsoleHelperImpl {
         }
         return result;
     }
-    
+
     public void setClientProgramName(String programName) {
         this.clientProgramName = programName;
     }
-    
+
     public String getClientProgramName() {
         return this.clientProgramName;
     }
