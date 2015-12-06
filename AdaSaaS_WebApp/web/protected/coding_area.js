@@ -18,12 +18,14 @@ function showWaitingElements() {
 
 var myCodeMirror;
 function init_coding_area() {
+    var frame = document.getElementById("coding_frame");
+    var btn = document.getElementById("btnCompile");
     var coding_area = document.getElementById("coding_area");
 
     myCodeMirror = CodeMirror.fromTextArea(coding_area, {
         lineNumbers: true
     });
-    myCodeMirror.setSize(600, 470);
+    myCodeMirror.setSize(frame.clientWidth,frame.clientHeight-btn.clientHeight-10);
 }
 
 function execute_script() {

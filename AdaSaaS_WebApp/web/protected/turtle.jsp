@@ -44,12 +44,12 @@
     <body>
         <div id="loading"></div>
         <div id="loading_im"></div>
-        <canvas id="turtle" width="600" height="500" ></canvas> 
+        <canvas id="turtle"></canvas> 
         <div id="coding_frame">
             <!--<button onclick="save_text()"><img src="images/save.png" alt="" class="btn_img"></button>--> 
-            <button onclick="compileAndSave2()"><img src="images/build.png" alt="" class="btn_img"></button>
-            <button onclick="execute_script()"><img src="images/execute.png" alt="" class="btn_img"></button> 
-            <button onclick="trash()"><img src="images/trash.png" alt="" class="btn_img"></button> 
+            <button onclick="compileAndSave2()"><img src="images/build.png" alt="" id="btnCompile" class="btn_img"></button>
+            <button onclick="execute_script()"><img src="images/execute.png" alt="" id="btnExec" class="btn_img"></button> 
+            <button onclick="trash()"><img src="images/trash.png" alt="" id="btnTrash" class="btn_img"></button> 
             <textarea id="coding_area"></textarea>
         </div>
         <textarea id="output" disabled>Output:</textarea>
