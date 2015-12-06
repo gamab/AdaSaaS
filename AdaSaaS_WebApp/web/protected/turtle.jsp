@@ -42,6 +42,8 @@
         <script src="codemirror-5.8/mode/ada/ada.js"></script>
     </head>
     <body>
+        <div id="loading"></div>
+        <div id="loading_im"></div>
         <canvas id="turtle" width="600" height="500" ></canvas> 
         <div id="coding_frame">
             <!--<button onclick="save_text()"><img src="images/save.png" alt="" class="btn_img"></button>--> 
@@ -54,6 +56,7 @@
 
         <script type="text/javascript">
             init_coding_area();
+            hideWaitingElements();
         </script>
     </body>
 </html>

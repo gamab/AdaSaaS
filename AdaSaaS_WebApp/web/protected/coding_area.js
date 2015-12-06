@@ -4,6 +4,17 @@
  * and open the template in the editor.
  */
 
+function hideWaitingElements() {
+    console.log("hide");
+    document.getElementById("loading").className = "hide";
+    document.getElementById("loading_im").className = "hide";
+}
+
+function showWaitingElements() {
+    console.log("show");
+    document.getElementById("loading").className = "";
+    document.getElementById("loading_im").className = "";
+}
 
 var myCodeMirror;
 function init_coding_area() {
@@ -36,29 +47,31 @@ function execute_script() {
             DSLScript.type = "text/javascript";
             document.body.appendChild(DSLScript);
             document.body.removeChild(DSLScript);
+            hideWaitingElements();
         }
     }
     xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
     xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
     xhr.send(null);
     document.getElementById("output").innerHTML = "Output: Sent compile request";
+    showWaitingElements();
 }
 
-function compileAndSave() {
-    console.log('Compile and Save');
-    var xhr = new XMLHttpRequest();
-    xhr.open("POST", "compile_and_save.do", true);
-    xhr.onreadystatechange = function () {
-        console.log(xhr.readyState);
-        if (xhr.readyState == 4) {
-            document.getElementById("output").value = "Output: " + xhr.responseText;
-        }
-    }
-    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-    xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
-    xhr.send(myCodeMirror.getValue());
-    document.getElementById("output").innerHTML = "Output: Sent compile request";
-}
+//function compileAndSave() {
+//    console.log('Compile and Save');
+//    var xhr = new XMLHttpRequest();
+//    xhr.open("POST", "compile_and_save.do", true);
+//    xhr.onreadystatechange = function () {
+//        console.log(xhr.readyState);
+//        if (xhr.readyState == 4) {
+//            document.getElementById("output").value = "Output: " + xhr.responseText;
+//        }
+//    }
+//    xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+//    xhr.setRequestHeader('Access-Control-Allow-Origin', '*');
+//    xhr.send(myCodeMirror.getValue());
+//    document.getElementById("output").innerHTML = "Output: Sent compile request";
+//}
 
 function compileAndSave2() {
     console.log('Compile and Save');
