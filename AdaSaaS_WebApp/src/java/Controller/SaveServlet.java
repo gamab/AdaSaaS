@@ -27,8 +27,6 @@ import javax.servlet.http.HttpSession;
 public class SaveServlet extends HttpServlet {
 
     protected String retrieveMainProcedureName(String fileLine) {
-        System.out.println("CompileAndSaveServlet : Searching for the main procedure name");
-
         String fileName = null;
         Pattern p = Pattern.compile("procedure (.+) is");
         Matcher m;
@@ -94,7 +92,7 @@ public class SaveServlet extends HttpServlet {
                         sh.executeProgram(Cmds.cmdRemoveFilesInDir(lines));
                     }
 
-                    //Save and compile the program into a file
+                    //Save the program into a file
                     if (sh.saveClientFile(fileName + ".adb", jb)) {
                         out.println("File saved");
                                                 

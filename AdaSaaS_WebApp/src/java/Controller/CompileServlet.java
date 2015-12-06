@@ -49,22 +49,18 @@ public class CompileServlet extends HttpServlet {
             } else {
                 //delete everything except the adb file
                 String fileName = sh.getClientProgramName();
-                List<String> lines = sh.executeProgram(Cmds.cmdListDir());
-                if (!lines.isEmpty()) {
-                    sh.executeProgram(Cmds.cmdRemoveFilesInDirExceptAdb(lines,fileName));
-                }
-
                 //compile the program
-                lines = sh.executeProgram(Cmds.cmdCompileAdbFileWEBINF(fileName,s.getServletContext()));
+                List<String> lines = sh.executeProgram(Cmds.cmdCompileAdbFileWEBINF(fileName,s.getServletContext()));
                 if (lines.isEmpty()) {
                     out.println("No output from gnatmake.");
                 }
-                //print the output to the client
-                for (String l : lines) {
-                    System.out.println(l);
-                    out.println(l);
+                else {
+                    //print the output to the client
+                    for (String l : lines) {
+                        System.out.println(l);
+                        out.println(l);
+                    }
                 }
-                sh.setClientProgramName(fileName);
             }
         }
     }
