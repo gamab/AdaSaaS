@@ -1,6 +1,5 @@
 package adaaas.monitor;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.TimerTask;
 
@@ -43,9 +42,9 @@ public class MonitoringTask extends TimerTask {
 		
 	
 		//Mise à jour de la liste
-		monitor.setList(copie);
+		monitor.getWrapper().setList(copie);
 		System.out.println("Liste du moniteur");
-		for (Machine m:monitor.getList()){
+		for (Machine m:monitor.getWrapper().getList()){
 			System.out.println(m);
 		}
 		
