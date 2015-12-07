@@ -15,27 +15,23 @@ import adaaas.MachineListe;
 
 public class ConfigEditor implements Runnable {
 
-	private String configFile="C:/Users/Aur�lien/test.conf";
-	private String configFileSortie="C:/Users/Aur�lien/buf";
-
-	//	private String configFile = "/home/febroshka/Téléchargements/AdaSaaS-master/ADAaaS_Cloud/src/adaaas/config/configfile";
-	//	private final String configFileSortie = "/home/febroshka/Téléchargements/AdaSaaS-master/ADAaaS_Cloud/src/adaaas/config/configfilesortie";
+	private String configFile="C:/Users/Aur�lien/test.conf";
+	private String configFileSortie="C:/Users/Aur�lien/buf";
 
 	private ArrayList<String> listOfIPs =new ArrayList<String>();;
 	private ArrayList<String> listMachine = new ArrayList<String>();
 
-	//	private InputStream ips;
-	//	private InputStreamReader ipsr;
-	//	private BufferedReader br;
-	//	private BufferedWriter fichier;
+	private InputStream ips;
+	private InputStreamReader ipsr;
+	private BufferedReader br;
+	private BufferedWriter fichier;
 
 	String ipRegexp = "(25[0-5]|2[0-4][0-9]|[0|1]?[0-9]{1,2})\\.(25[0-5]|2[0-4][0-9]|[0|1]?[0-9]{1,2})\\.(25[0-5]|2[0-4][0-9]|[0|1]?[0-9]{1,2})\\.(25[0-5]|2[0-4][0-9]|[0|1]?[0-9]{1,2})";
-	String beforeIPRegExp = ".+server.+";
+	String beforeIPRegExp = "        server.+";
+	String regExpTest = "        server [a-z]+[0-9]?";
 
 
 	private MachineListe wrapper;
-
-
 
 	public ConfigEditor(MachineListe wrapper) {
 		this.wrapper=wrapper;
@@ -45,32 +41,32 @@ public class ConfigEditor implements Runnable {
 		return wrapper;
 	}
 
-
 	public void setWrapper(MachineListe wrapper) {
 		this.wrapper = wrapper;
 	}
+	
+	/////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	private void initFlow(String source, String dest) {
+		try {
+			ips = new FileInputStream(source);
+			ipsr = new InputStreamReader(ips);
+			br = new BufferedReader(ipsr);
+			fichier = new BufferedWriter(new FileWriter(dest));
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+	}
 
-	//	private void initFlow(String source, String dest) {
-	//		try {
-	//			ips = new FileInputStream(source);
-	//			ipsr = new InputStreamReader(ips);
-	//			br = new BufferedReader(ipsr);
-	//			fichier = new BufferedWriter(new FileWriter(dest));
-	//		} catch (Exception e) {
-	//			System.out.println(e.toString());
-	//		}
-	//	}
-
-	//	private void closeFlow() {
-	//		try {
-	//			fichier.close();
-	//			br.close();
-	//			buildList();
-	//			updateFile();
-	//		} catch (Exception e) {
-	//			System.out.println(e.toString());
-	//		}
-	//	}
+	private void closeFlow() {
+		try {
+			fichier.close();
+			br.close();
+			updateFile();
+		} catch (Exception e) {
+			System.out.println(e.toString());
+		}
+	}
 
 	private void printListOfIPs() {
 		System.out.println("List of IP adresses :");
@@ -82,20 +78,10 @@ public class ConfigEditor implements Runnable {
 	private boolean checkIfPresent(String ip) {
 		return this.listOfIPs.contains(ip);
 	}
-
+	
 	private void removeIP(String ip) {
-		InputStream ips;
-		InputStreamReader ipsr;
-		BufferedReader br;
-		BufferedWriter fichier;
-
-
-
+		initFlow(configFile, configFileSortie);
 		try {
-			ips = new FileInputStream(configFile);
-			ipsr = new InputStreamReader(ips);
-			br = new BufferedReader(ipsr);
-			fichier = new BufferedWriter(new FileWriter(configFileSortie));
 			String ligne = "";
 			while ((ligne = br.readLine()) != null) {
 				if (ligne.matches(beforeIPRegExp)
@@ -107,42 +93,36 @@ public class ConfigEditor implements Runnable {
 					fichier.newLine();
 				}
 			}
-			fichier.close();
-			br.close();
-			buildList();
-			updateFile();
-
+			closeFlow();
 		} catch (Exception e) {
 			System.out.println(e.toString());
-		} finally {
-
 		}
 	}
 
 	private void addIP(Machine machine) {
-		InputStream ips;
-		InputStreamReader ipsr;
-		BufferedReader br;
-		BufferedWriter fichier;
-
+		initFlow(configFile, configFileSortie);
 		try {
-			ips = new FileInputStream(configFile);
-			ipsr = new InputStreamReader(ips);
-			br = new BufferedReader(ipsr);
-			fichier = new BufferedWriter(new FileWriter(configFileSortie));
 			String ligne;
 			while ((ligne = br.readLine()) != null) {
 				fichier.write(ligne);
 				fichier.newLine();
 			}
 			fichier.write("        ");
-			fichier.write("server "+machine.getName()+" "+machine.getIp()+":80"
-					+ " " + "cookie S" + machine.getIp().charAt(10) + " check");
+
+			String chaine2 = machine.getIp();
+			String reg = ("\\.");
+			String[] tableau = chaine2.split(reg);
+			String inter = tableau[2];
+
+			fichier.write("server " + machine.getName() + " " + machine.getIp()
+					+ ":80 cookie S" + tableau[3] + " check");
+
 			fichier.newLine();
+
 			fichier.close();
 			br.close();
-			buildList();
 			updateFile();
+
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
@@ -150,15 +130,9 @@ public class ConfigEditor implements Runnable {
 
 	private void updateFile() {
 		String ligne = "";
-		InputStream ips;
-		InputStreamReader ipsr;
-		BufferedReader br;
-		BufferedWriter fichier;
+		initFlow(configFileSortie, configFile);
 		try {
-			ips = new FileInputStream(configFile);
-			ipsr = new InputStreamReader(ips);
-			br = new BufferedReader(ipsr);
-			fichier = new BufferedWriter(new FileWriter(configFileSortie));
+
 			while ((ligne = br.readLine()) != null) {
 				fichier.write(ligne);
 				fichier.newLine();
@@ -180,13 +154,13 @@ public class ConfigEditor implements Runnable {
 				if (checkIfPresent(machine.getIp())) {
 					// System.out.println("Présente dans la liste");
 				} else {
-					// System.out.println("absente de la liste");
+					// System.out.println("absente de la liste :"+machine.getIp()+" --> ajout");
+					printListOfIPs();
 					this.addIP(machine);
 				}
 			} else {
 				if (checkIfPresent(machine.getIp())) {
 					// System.out.println("Présente dans la liste");
-
 					this.removeIP(machine.getIp());
 				} else {
 					// System.out.println("absente de la liste");
@@ -197,54 +171,48 @@ public class ConfigEditor implements Runnable {
 
 	private void buildList() {
 		this.listOfIPs.clear();
-		String ligne = "";
-		InputStream ips;
-		InputStreamReader ipsr;
-		BufferedReader br;
-		BufferedWriter fichier;
 
 		try {
-
+			String ligne;
 			ips = new FileInputStream(this.configFile);
 			ipsr = new InputStreamReader(ips);
 			br = new BufferedReader(ipsr);
 
+			fichier = new BufferedWriter(new FileWriter(configFileSortie));
+
 			while ((ligne = br.readLine()) != null) {
-				if (ligne.matches(beforeIPRegExp)) {
-					String inter = ligne.substring(22, 33);
-					if (inter.matches(ipRegexp)) {
+				if (!(ligne.matches(beforeIPRegExp))) {
+					fichier.write(ligne);
+					fichier.newLine();
+				} else {
+					String chaine2 = ligne.substring(8, ligne.length());
+					String reg = (" |:");
+					String[] tableau = chaine2.split(reg);
+					String inter = tableau[2];
+					// printListOfIPs();
+					if (listMachine.contains(inter)
+							&& !(listOfIPs.contains(inter))) {
 						listOfIPs.add(inter);
+						fichier.write(ligne);
+						fichier.newLine();
+					} else {
+
 					}
 				}
+
 			}
 			br.close();
-
-			for (String ip : listOfIPs) {
-				if (listMachine.contains(ip)) {
-				} else {
-					this.removeIP(ip);
-				}
-			}
+			fichier.close();
+			updateFile();
 
 		} catch (Exception e) {
 			System.out.println(e.toString());
 		}
-
-
 	}
 
-
-
-
-
 	private void printConfigFile(String file) {
-		String ligne = "";
-		InputStream ips;
-		InputStreamReader ipsr;
-		BufferedReader br;
-		BufferedWriter fichier;
 		try {
-			
+			String ligne;
 			ips = new FileInputStream(file);
 			ipsr = new InputStreamReader(ips);
 			br = new BufferedReader(ipsr);
@@ -282,32 +250,33 @@ public class ConfigEditor implements Runnable {
 
 		// lance la tache periodique
 
-
-		//On cr�e le timer
+		//On cr�e le timer
 		Timer time = new Timer(); 
 
 		//On instancie la routine de monitoring
 		ConfigEditorTask cet = new ConfigEditorTask(this);
 
-		//On programme la t�che 
+		//On programme la t�che 
 		time.schedule(cet, 30000, 10000); 
 
 	}
 
 	public static void main(String[] args) {
 
-		List<Machine> wrap = new ArrayList<Machine>();
+		/*List<Machine> wrap = new ArrayList<Machine>();
 		// (String ip, int id, String name,boolean running,float cpu)
 		Machine machine1 = new Machine("192.168.2.1", 1, "bijou", true,
 				(float) 1.33);
-		machine1.setEligible(false);
+		machine1.setEligible(true);
+
 		Machine machine2 = new Machine("192.168.2.2", 1, "bijou2", true,
 				(float) 1.33);
-		machine2.setEligible(false);
+		machine2.setEligible(true);
 		Machine machine3 = new Machine("192.168.2.3", 1, "bijou3", true,
 				(float) 1.33);
 		Machine machine4 = new Machine("192.168.2.4", 1, "bijou4", false,
 				(float) 1.33); // à supprimer
+		machine4.setEligible(false);
 		Machine machine5 = new Machine("192.168.2.5", 1, "bijou2", true,
 				(float) 1.33); // à ajouter
 		machine5.setEligible(true);
@@ -320,10 +289,8 @@ public class ConfigEditor implements Runnable {
 		wrap.add(machine4);
 		wrap.add(machine5);
 		wrap.add(machine6);
-		MachineListe wrapper = new MachineListe();
-		wrapper.setList(wrap);
 
-		ConfigEditor edit1 = new ConfigEditor(wrapper);
+		ConfigEditor edit1 = new ConfigEditor(wrap);
 		System.out.println(" -- Fichier de config initial --");
 		edit1.printConfigFile(edit1.configFile);
 
@@ -339,24 +306,26 @@ public class ConfigEditor implements Runnable {
 		 * //System.out.println(" -- Fichier de sortie --");
 		 * //edit1.printConfigFile(edit1.configFile);
 		 * System.out.println("Test ajout d'une IP : 192.168.2.4");
-		 * //edit1.addIP("192.168.2.7");
+		 * dit1.addIP("192.168.2.7");
 		 * System.out.println(" -- Fichier en sortie --");
 		 * edit1.printConfigFile(edit1.configFile);
 		 * ///edit1.removeIP("192.168.2.4");
 		 * edit1.printConfigFile(edit1.configFile);
-		 */
+		 
+
+		System.out.println("Début liste machine");
+		edit1.buildMachineList(wrap);
+		edit1.printListmachine();
+		System.out.println("Fin liste machine");
 
 		System.out.println("Début liste IP");
 		edit1.buildList();
 		edit1.printListOfIPs();
 		System.out.println("Fin liste IP");
 
-		System.out.println("Début liste machine");
-		edit1.buildMachineList(wrap);
-		edit1.printListmachine();
-		System.out.println("Fin liste machine");
-		edit1.readAndUpdate();
+		edit1.readAndUpdate(wrap);
 		edit1.printConfigFile(edit1.configFile);
+		*/
 
 	}
 
