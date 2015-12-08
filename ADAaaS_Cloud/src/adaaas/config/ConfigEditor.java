@@ -15,11 +15,11 @@ import adaaas.MachineListe;
 
 public class ConfigEditor implements Runnable {
 
-	private String configFile="C:/Users/Aur�lien/test.conf";
-	private String configFileSortie="C:/Users/Aur�lien/buf";
+	private String configFile="/etc/haproxy/haproxy.conf";
+	private String configFileSortie="/etc/haproxybuf";
 
-	private ArrayList<String> listOfIPs =new ArrayList<String>();;
-	private ArrayList<String> listMachine = new ArrayList<String>();
+	ArrayList<String> listOfIPs =new ArrayList<String>();;
+	ArrayList<String> listMachine = new ArrayList<String>();
 
 	private InputStream ips;
 	private InputStreamReader ipsr;
@@ -32,9 +32,11 @@ public class ConfigEditor implements Runnable {
 
 
 	private MachineListe wrapper;
+	private String path;
 
-	public ConfigEditor(MachineListe wrapper) {
+	public ConfigEditor(MachineListe wrapper,String path) {
 		this.wrapper=wrapper;
+		this.path=path;
 	}
 
 	public MachineListe getWrapper() {
@@ -44,9 +46,9 @@ public class ConfigEditor implements Runnable {
 	public void setWrapper(MachineListe wrapper) {
 		this.wrapper = wrapper;
 	}
-	
+
 	/////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	private void initFlow(String source, String dest) {
 		try {
 			ips = new FileInputStream(source);
@@ -76,9 +78,13 @@ public class ConfigEditor implements Runnable {
 	}
 
 	private boolean checkIfPresent(String ip) {
-		return this.listOfIPs.contains(ip);
+		for (String s:listOfIPs){
+			if (s.equals(ip))
+				return true;
+		}
+		return false;
 	}
-	
+
 	private void removeIP(String ip) {
 		initFlow(configFile, configFileSortie);
 		try {
@@ -115,7 +121,7 @@ public class ConfigEditor implements Runnable {
 			String inter = tableau[2];
 
 			fichier.write("server " + machine.getName() + " " + machine.getIp()
-					+ ":80 cookie S" + tableau[3] + " check");
+			+ ":80 cookie S" + tableau[3] + " check");
 
 			fichier.newLine();
 
@@ -149,27 +155,23 @@ public class ConfigEditor implements Runnable {
 	public void readAndUpdate() {
 
 		for (Machine machine : wrapper.getList()) {
-			// System.out.println(" IsElegible : " + machine.isEligible());
+
+
 			if (machine.isEligible()) {
-				if (checkIfPresent(machine.getIp())) {
-					// System.out.println("Présente dans la liste");
-				} else {
-					// System.out.println("absente de la liste :"+machine.getIp()+" --> ajout");
-					printListOfIPs();
+				if (!checkIfPresent(machine.getIp())) {
 					this.addIP(machine);
 				}
 			} else {
 				if (checkIfPresent(machine.getIp())) {
-					// System.out.println("Présente dans la liste");
+					System.out.println("SUPPRIME");
 					this.removeIP(machine.getIp());
-				} else {
-					// System.out.println("absente de la liste");
+
 				}
 			}
 		}
 	}
 
-	private void buildList() {
+	public void buildList() {
 		this.listOfIPs.clear();
 
 		try {
@@ -226,9 +228,9 @@ public class ConfigEditor implements Runnable {
 		}
 	}
 
-	private void buildMachineList(List<Machine> list) {
+	public void buildMachineList() {
 		this.listMachine.clear();
-		for (Machine mach : list) {
+		for (Machine mach : this.wrapper.getList()) {
 			if (mach.isEligible()) {
 				this.listMachine.add(mach.getIp());
 			}
@@ -245,8 +247,9 @@ public class ConfigEditor implements Runnable {
 	@Override
 	public void run() {
 		// config
-		buildList();
-		//readAndUpdate();
+		buildMachineList(); //copie les ip seulement (eligibles)
+		buildList(); //regarde le fichier et ne conserve que les IP qui sont eligibles
+		readAndUpdate();
 
 		// lance la tache periodique
 
@@ -311,7 +314,7 @@ public class ConfigEditor implements Runnable {
 		 * edit1.printConfigFile(edit1.configFile);
 		 * ///edit1.removeIP("192.168.2.4");
 		 * edit1.printConfigFile(edit1.configFile);
-		 
+
 
 		System.out.println("Début liste machine");
 		edit1.buildMachineList(wrap);
@@ -325,7 +328,7 @@ public class ConfigEditor implements Runnable {
 
 		edit1.readAndUpdate(wrap);
 		edit1.printConfigFile(edit1.configFile);
-		*/
+		 */
 
 	}
 

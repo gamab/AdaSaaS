@@ -6,24 +6,21 @@ import adaaas.monitor.Monitor;
 public class ADAaas {
 
 	public static void main(String[] args) {
-		
-		MachineListe wrapper = new MachineListe();
-
-		new ConfigEditor(wrapper).run();
-		new Monitor(wrapper).run();
-
-		for (int i = 0;i<1000;i++){
-			try {
-				System.out.println("Affichage de la liste dans le main ");
-				for (Machine m :wrapper.getList()){
-					System.out.println(m);
-				}
-				Thread.sleep(5000);
-			} catch (Exception e){
-				e.printStackTrace();
-			}
+		if (args.length!=1){
+			System.out.println("Where is the config file bro ?");
+			System.exit(1);
 
 		}
+		String path = args[0];
+
+		MachineListe wrapper = new MachineListe();
+		ConfigEditor editor =new ConfigEditor(wrapper,path);
+		editor.run();
+
+		new Monitor(wrapper,editor).run();
+
+
+
 
 
 	}

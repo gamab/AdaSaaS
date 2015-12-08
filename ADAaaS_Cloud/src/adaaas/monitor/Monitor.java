@@ -1,12 +1,12 @@
 package adaaas.monitor;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Timer;
 
 import adaaas.Machine;
 import adaaas.MachineListe;
+import adaaas.config.ConfigEditor;
 import net.elbandi.pve2api.data.VmOpenvz;
 import proxmox.api.API;
 
@@ -14,10 +14,11 @@ public class Monitor implements Runnable{
 	
 	private MachineListe wrapper;
 	private MonitoringTask mt;
+	private ConfigEditor editor;
 	
 	
 
-	public Monitor(MachineListe wrapper) {
+	public Monitor(MachineListe wrapper,ConfigEditor editor) {
 		this.wrapper=wrapper;
 	}
 
@@ -25,11 +26,10 @@ public class Monitor implements Runnable{
 
 	@Override
 	public void run() {
-		System.out.println("Yeah le moniteur est OK :D");
 		
 		
 		//Configuration de la connexion
-		if (!API.auth("aurel", "________")){
+		if (!API.auth("aurel", "_______")){
 			System.exit(0);
 		}
 		
