@@ -20,6 +20,7 @@ public class Monitor implements Runnable{
 
 	public Monitor(MachineListe wrapper,ConfigEditor editor) {
 		this.wrapper=wrapper;
+		this.editor=editor;
 	}
 
 
@@ -29,7 +30,7 @@ public class Monitor implements Runnable{
 		
 		
 		//Configuration de la connexion
-		if (!API.auth("aurel", "_______")){
+		if (!API.auth("aurel", "______")){
 			System.exit(0);
 		}
 		
@@ -83,6 +84,20 @@ public class Monitor implements Runnable{
 
 	public void setWrapper(MachineListe wrapper) {
 		this.wrapper = wrapper;
+	}
+	
+	
+
+
+
+	public ConfigEditor getEditor() {
+		return editor;
+	}
+
+
+
+	public void setEditor(ConfigEditor editor) {
+		this.editor = editor;
 	}
 
 

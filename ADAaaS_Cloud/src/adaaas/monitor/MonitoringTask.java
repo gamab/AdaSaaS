@@ -3,6 +3,7 @@ package adaaas.monitor;
 import java.util.List;
 import java.util.TimerTask;
 
+import adaaas.ADAaas;
 import adaaas.Machine;
 import proxmox.api.API;
 
@@ -18,7 +19,7 @@ public class MonitoringTask extends TimerTask {
 	}
 
 	@Override
-	public void run() {
+	public synchronized void run() {
 		System.out.println("Salut poto je suis la routine de monitoring");
 		
 		
@@ -27,8 +28,11 @@ public class MonitoringTask extends TimerTask {
 		System.out.println("Nouvelle liste");
 		if (deploymentMade){
 			deploymentMade=false;
-			//TODO notify ConfigEditor
 			
+			synchronized(ADAaas.LOCK){
+				System.out.println("Monitor : Je notifie ! ");
+				ADAaas.LOCK.notify();
+			}
 		}
 		
 		int nombreMachineEligible = 0;
