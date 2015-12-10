@@ -5,7 +5,6 @@
  */
 package Controller;
 
-import System.Cmds;
 import System.ConsoleHelper;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,7 +19,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author gb
  */
-public class ExecServlet extends HttpServlet {
+public class GetScriptServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -33,29 +32,31 @@ public class ExecServlet extends HttpServlet {
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("ExecServlet");
+        System.out.println("GetScriptServlet");
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
+            System.out.println("Sending the client script");
+            /* TODO output your page here. You may use following sample code. */
             HttpSession s = request.getSession();
-            System.out.print("running client's programm");
             ConsoleHelper sh = (ConsoleHelper) s.getAttribute("consoleHelper");
             if (sh == null) {
-                out.println("ERROR : consoleHelper does not exist in session.");
+                out.println("alert(\"ERROR : Session does not exist.\");");
             } else {
-                String programName = sh.getClientProgramName();
-                List<String> lines = sh.executeProgram(Cmds.cmdExecuteProgram(programName));
-                if (lines.isEmpty()) {
-                    out.println("No output.");
-                }
-                for (String l : lines) {
-                    System.out.println(l);
-                    out.println(l);
+                List<String> lines = sh.getTurtleScript("client_turtle_script.js");
+                if (lines == null) {
+                    out.println("console.log(\"ERROR : No graphical output.\");");
+                } else {
+                    for (String l : lines) {
+                        System.out.println(l);
+                        out.println(l);
+                    }
                 }
             }
+
         }
     }
 
-// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -81,7 +82,6 @@ public class ExecServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        //processRequest(request, response);
     }
 
     /**
