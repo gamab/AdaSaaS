@@ -21,6 +21,10 @@
         <servlet-class>Controller.ExecServlet</servlet-class>
     </servlet>
     <servlet>
+        <servlet-name>GetImageServlet</servlet-name>
+        <servlet-class>Controller.GetImageServlet</servlet-class>
+    </servlet>
+    <servlet>
         <servlet-name>TrashServlet</servlet-name>
         <servlet-class>Controller.TrashServlet</servlet-class>
     </servlet>
@@ -35,6 +39,10 @@
     <servlet-mapping>
         <servlet-name>CompileServlet</servlet-name>
         <url-pattern>/protected/compile.do</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>GetImageServlet</servlet-name>
+        <url-pattern>/protected/get_image.do</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>CompileAndSaveServlet</servlet-name>

@@ -5,6 +5,7 @@
  */
 package System;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,6 +21,8 @@ public interface ConsoleHelperImpl {
     public boolean saveClientFile(String fileName, ArrayList<String> lines);
     
     public List<String> getClientFile(String fileName);
+    
+    public File getClientImage();
     
     public ArrayList<String> executeProgram(String programName);
     

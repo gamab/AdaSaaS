@@ -5,6 +5,7 @@
  */
 package System;
 
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,8 +18,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import javax.imageio.ImageIO;
 import org.apache.commons.io.FileUtils;
 
 /**
@@ -28,7 +28,7 @@ import org.apache.commons.io.FileUtils;
 public class ConsoleHelper implements ConsoleHelperImpl {
 
     private static int timeout = 30;
-    
+
     private String clientID;
 
     private String clientProgramName;
@@ -38,7 +38,7 @@ public class ConsoleHelper implements ConsoleHelperImpl {
         this.clientID = clientID;
         File dir = new File(clientID);
         boolean created = dir.mkdir();
-        System.out.println(dir.getAbsolutePath());
+        System.err.println(dir.getAbsolutePath());
 
         return created;
     }
@@ -50,7 +50,7 @@ public class ConsoleHelper implements ConsoleHelperImpl {
         try {
             FileUtils.deleteDirectory(dir);
         } catch (IOException ex) {
-            System.out.println("ConsoleHelper : Error deleting the directory." + ex.getMessage());
+            System.err.println("ConsoleHelper : Error deleting the directory." + ex.getMessage());
             delete = false;
         }
         return delete;
@@ -67,10 +67,10 @@ public class ConsoleHelper implements ConsoleHelperImpl {
             }
             writer.close();
         } catch (FileNotFoundException ex) {
-            System.out.println("ConsoleHelper : Error saving client's file " + ex.getMessage());
+            System.err.println("ConsoleHelper : Error saving client's file " + ex.getMessage());
             saved = false;
         } catch (UnsupportedEncodingException ex) {
-            System.out.println("ConsoleHelper : Error saving client's file " + ex.getMessage());
+            System.err.println("ConsoleHelper : Error saving client's file " + ex.getMessage());
             saved = false;
         }
         if (writer != null) {
@@ -86,9 +86,14 @@ public class ConsoleHelper implements ConsoleHelperImpl {
         try {
             result = Files.readAllLines(Paths.get(clientID + "/" + fileName));
         } catch (IOException ex) {
-            System.out.println("ConsoleHelper : Error retrieving client's file " + ex.getMessage());
+            System.err.println("ConsoleHelper : Error retrieving client's file " + ex.getMessage());
         }
         return result;
+    }
+
+    @Override
+    public File getClientImage() {
+        return new File(clientID + "/out.bmp");
     }
 
     /*@Override
@@ -117,7 +122,6 @@ public class ConsoleHelper implements ConsoleHelperImpl {
         }
         return result;
     }*/
-
     @Override
     public ArrayList<String> executeProgram(String programName) {
         System.out.println("ConsoleHelper : executing programm " + programName);
@@ -133,8 +137,7 @@ public class ConsoleHelper implements ConsoleHelperImpl {
                 result.add("Program timed out after " + timeout + "seconds.\nYou probably have an infinite loop.");
                 //timeout
                 p.destroy();
-            }
-            else {
+            } else {
                 BufferedReader reader
                         = new BufferedReader(new InputStreamReader(p.getInputStream()));
                 BufferedReader reader_err
@@ -149,9 +152,9 @@ public class ConsoleHelper implements ConsoleHelperImpl {
                 }
             }
         } catch (IOException ex) {
-            System.out.println("ConsoleHelper : Error executing programm " + programName + " " + ex.getMessage());
+            System.err.println("ConsoleHelper : Error executing programm " + programName + " " + ex.getMessage());
         } catch (InterruptedException ex) {
-            System.out.println("ConsoleHelper : Error executing programm " + programName + " timeout : " + ex.getMessage());
+            System.err.println("ConsoleHelper : Error executing programm " + programName + " timeout : " + ex.getMessage());
         }
         return result;
     }
@@ -163,7 +166,7 @@ public class ConsoleHelper implements ConsoleHelperImpl {
         try {
             result = Files.readAllLines(Paths.get(clientID + "/" + scriptName));
         } catch (IOException ex) {
-            System.out.println("ConsoleHelper : Error retrieving client's file " + ex.getMessage());
+            System.err.println("ConsoleHelper : Error retrieving client's file " + ex.getMessage());
         }
         return result;
     }

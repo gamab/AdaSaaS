@@ -34,6 +34,7 @@
         <title>turtle</title>
         <link rel="stylesheet" type="text/css" href="turtle_style.css">
         <script type="text/javascript" src="turtle_script.js"></script>
+        <script type="text/javascript" src="image_drawer.js"></script>
         <script type="text/javascript" src="coding_area.js"></script>
 
         <!--Code mirror-->
@@ -53,6 +54,7 @@
             <textarea id="coding_area"></textarea>
         </div>
         <textarea id="output" disabled>Output:</textarea>
+        <div id="imagetest"></div>
 
         <script type="text/javascript">
             init_coding_area();
