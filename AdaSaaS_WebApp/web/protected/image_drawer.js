@@ -15,22 +15,23 @@ function draw_image(width, height) {
     imageObj.addEventListener('load', function () {
         console.log("loading");
         /// set size proportional to image
-        c.height = c.width * (imageObj.height / imageObj.width);
+        //c.height = c.width * (imageObj.height / imageObj.width);
 
         /// step 1 - resize to 50%
-        var oc = document.createElement('canvas'),
-                octx = oc.getContext('2d');
+        //var oc = document.createElement('canvas'),
+        //octx = oc.getContext('2d');
 
-        oc.width = imageObj.width * 0.5;
-        oc.height = imageObj.height * 0.5;
-        octx.drawImage(imageObj, 0, 0, oc.width, oc.height);
+        //oc.width = imageObj.width * 0.5;
+        //oc.height = imageObj.height * 0.5;
+        //octx.drawImage(imageObj, 0, 0, oc.width, oc.height);
 
         /// step 2 - resize 50% of step 1
-        octx.drawImage(oc, 0, 0, oc.width * 0.5, oc.height * 0.5);
+        //octx.drawImage(oc, 0, 0, oc.width * 0.5, oc.height * 0.5);
 
         /// step 3, resize to final size
-        ctx.drawImage(oc, 0, 0, oc.width * 0.5, oc.height * 0.5,
-                0, 0, c.width, c.height);
+        //ctx.drawImage(oc, 0, 0, oc.width * 0.5, oc.height * 0.5,
+        //        0, 0, c.width, c.height);
+        ctx.drawImage(imageObj,0, 0, c.width, c.height);
     }, false);
     //document.body.appendChild(imageObj);
     console.log("------------------------");
