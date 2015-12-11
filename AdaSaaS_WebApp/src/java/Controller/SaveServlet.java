@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +40,27 @@ public class SaveServlet extends HttpServlet {
 
         return fileName;
     }
+    
+    protected String changeLoadCall(String fileLine,ServletContext context) {
+        String changedLine = fileLine;
+        Pattern p = Pattern.compile("(.*BMP[.]Load[ ]*[(][ ]*\")(.+)(\"[ ]*[)][ ]*;.*)");
+        Matcher m;
+        String imPath = null;
+
+        System.out.println(fileLine);
+        m = p.matcher(fileLine);
+        if (m.find()) {
+            changedLine = m.group(1);
+            imPath = context.getRealPath("/WEB-INF/image_pool/"+m.group(2));
+            if (imPath== null) {
+                imPath = context.getRealPath("/WEB-INF/image_pool/chaplin.bmp");
+            }
+            changedLine += imPath;
+            changedLine += m.group(3);
+            System.out.println("Changed line :" + changedLine);
+        }
+        return changedLine;
+    }
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -63,11 +85,14 @@ public class SaveServlet extends HttpServlet {
             try {
                 BufferedReader reader = request.getReader();
                 while ((line = reader.readLine()) != null) {
-                    jb.add(line);
                     //Check if the line contains the fileName;
                     if (fileName == null) {
                         fileName = retrieveMainProcedureName(line);
                     }
+                    //Change load call
+                    line = changeLoadCall(line, this.getServletContext());
+                    //Add the line to be saved
+                    jb.add(line);
                 }
             } catch (Exception e) {
                 System.out.println("Save_Text.java : Error " + e.getMessage() + " in doPost");
