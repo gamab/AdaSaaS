@@ -70,7 +70,9 @@ public class Monitor implements Runnable{
 		
 		for (VmOpenvz vm: list){
 			if (vm.getVmid() >200){
-				retour.add(new Machine(vm.getIp(), vm.getVmid(), vm.getName(),vm.isRunning(),vm.getCpu()));
+				retour.add(new Machine(vm.getIp(), vm.getVmid(), 
+						vm.getName(),vm.isRunning(),vm.getCpu(),
+						vm.getNetin(),vm.getNetout()));
 			}
 		}
 		return retour;
@@ -116,6 +118,7 @@ public class Monitor implements Runnable{
 
 	}
 	
+	//Meme pas besoin de detecter le fait qu'on est à cours de container ! ça se fera tout seul en refusant les requetes.
 	public void deployNew(){
 		for(Machine m:wrapper.getList()){
 			if (!m.isRunning()){
@@ -128,7 +131,10 @@ public class Monitor implements Runnable{
 				return;
 			}
 		}
-		//TODO détecter le fait qu'on est à cours de containers !!!!!!!!!!!!!
+	}
+	
+	public void stop(Machine m){
+		API.arreterContainer(m.getId());
 	}
 	
 	

@@ -7,15 +7,20 @@ public class Machine {
 	private String name;
 	private boolean running;
 	private boolean eligible;
+	private boolean deletable;
 	private float cpu;
+	private long netin;
+	private long netout;
 	
-	public Machine(String ip, int id, String name,boolean running,float cpu) {
+	public Machine(String ip, int id, String name,boolean running,float cpu,long netin,long netout) {
 		this.ip = ip;
 		this.id = id;
 		this.name = name;
 		this.eligible=false;
 		this.running=running;
 		this.cpu =cpu;
+		this.netin=netin;
+		this.netout=netout;
 	}
 
 	public String getIp() {
@@ -67,14 +72,38 @@ public class Machine {
 	public void setCpu(float cpu) {
 		this.cpu = cpu;
 	}
+	
+	
+
+
+	
+	
+	public long getNetin() {
+		return netin;
+	}
+
+	public void setNetin(int netin) {
+		this.netin = netin;
+	}
+
+	public long getNetout() {
+		return netout;
+	}
+
+	public void setNetout(int netout) {
+		this.netout = netout;
+	}
+	
+	
 
 	@Override
 	public String toString() {
 		return "Machine [ip=" + ip + ", id=" + id + ", name=" + name + ", running=" + running + ", eligible=" + eligible
-				+ ", cpu=" + cpu + "]";
+				+ ", cpu=" + cpu + ", netin=" + netin + ", netout=" + netout + "]";
 	}
+
 	
-	
+	//TODO update the eligibility criteria
 	public boolean updateEligible(){
 		if (this.isRunning()&& this.cpu<0.50){
 			eligible =true;
@@ -82,6 +111,17 @@ public class Machine {
 			eligible=false;
 		}
 		return eligible;
+	}
+	
+	
+	//TODO update the deletability criteria
+	public boolean updateDeletable(){
+		if (this.netin<1000 && this.netout>1000){
+			deletable= true;
+		} else {
+			deletable = false;
+		}
+		return deletable;
 	}
 	
 	

@@ -10,12 +10,12 @@ import proxmox.api.API;
 public class MonitoringTask extends TimerTask {
 	
 	private Monitor monitor;
-	private boolean deploymentMade;
+	private boolean updateMade;
 	
 	
 	public MonitoringTask(Monitor monitor){
 		this.monitor=monitor;
-		deploymentMade =false;
+		updateMade =false;
 	}
 
 	@Override
@@ -26,8 +26,8 @@ public class MonitoringTask extends TimerTask {
 		//On travaille avec la nouvelle liste
 		List<Machine> copie = Monitor.containersToMachine(API.recupererContainers());
 		System.out.println("Nouvelle liste");
-		if (deploymentMade){
-			deploymentMade=false;
+		if (updateMade){
+			updateMade=false;
 			
 			synchronized(ADAaas.LOCK){
 				System.out.println("Monitor : Je notifie ! ");
@@ -40,15 +40,24 @@ public class MonitoringTask extends TimerTask {
 			if (m.updateEligible()){
 				nombreMachineEligible++;
 			}
+			
+			if (m.updateDeletable()){
+				//monitor.stop(m);
+			}
 		}
+		
+		
+		
+		
 		System.out.println("Nombre de machine eligible : "+nombreMachineEligible);
 		
-		if (nombreMachineEligible<=1){
+		
+		//TODO ajouter toute la partie suppression ici.
+		if (nombreMachineEligible<=1 ){
 			monitor.deployNew();
-			deploymentMade =true;
+			updateMade =true;
 		}
 		
-		//TODO Maintenant il faudrait identifier le moment ou une machine n'a pas de client pour l'éteindre.
 		
 
 		
