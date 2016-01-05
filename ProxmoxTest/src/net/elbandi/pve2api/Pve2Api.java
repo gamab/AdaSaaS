@@ -503,9 +503,7 @@ public class Pve2Api {
 		List<VmOpenvz> res = new ArrayList<VmOpenvz>();
 		JSONObject jObj = pve_action("/nodes/" + node + "/openvz", RestClient.RequestMethod.GET,
 				null);
-//		System.out.println(jObj.toString());
 		JSONArray data2 = jObj.getJSONArray("data");
-		System.out.println(data2.toString());
 		for (int i = 0; i < data2.length(); i++) {
 			res.add(new VmOpenvz(data2.getJSONObject(i)));
 		}

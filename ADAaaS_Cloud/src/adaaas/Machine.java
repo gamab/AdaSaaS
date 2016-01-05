@@ -12,6 +12,10 @@ public class Machine {
 	private long netin;
 	private long netout;
 	
+	
+	//Si ce nombre arrive à 5 alors il n'y a plus personne sur le Container
+	private int count;
+	
 	public Machine(String ip, int id, String name,boolean running,float cpu,long netin,long netout) {
 		this.ip = ip;
 		this.id = id;
@@ -21,6 +25,7 @@ public class Machine {
 		this.cpu =cpu;
 		this.netin=netin;
 		this.netout=netout;
+		this.count=0;
 	}
 
 	public String getIp() {
@@ -105,7 +110,7 @@ public class Machine {
 	
 	//TODO update the eligibility criteria
 	public boolean updateEligible(){
-		if (this.isRunning()&& this.cpu<0.50){
+		if (this.isRunning()&& this.cpu<0.90){
 			eligible =true;
 		} else {
 			eligible=false;
@@ -116,12 +121,23 @@ public class Machine {
 	
 	//TODO update the deletability criteria
 	public boolean updateDeletable(){
-		if (this.netin<1000 && this.netout>1000){
-			deletable= true;
+		if (isRunning() && this.netin<1000 && this.netout<1000){
+			count++;
 		} else {
-			deletable = false;
+			count = 0;
 		}
+		
+		if (count>5){
+			deletable = true;
+		}
+		
+		
 		return deletable;
+	}
+
+	public void setDelete(boolean b) {
+		deletable=b;
+		
 	}
 	
 	

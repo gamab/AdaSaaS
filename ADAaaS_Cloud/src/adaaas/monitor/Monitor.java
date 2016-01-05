@@ -6,7 +6,6 @@ import java.util.Timer;
 
 import adaaas.Machine;
 import adaaas.MachineListe;
-import adaaas.config.ConfigEditor;
 import net.elbandi.pve2api.data.VmOpenvz;
 import proxmox.api.API;
 
@@ -14,13 +13,11 @@ public class Monitor implements Runnable{
 	
 	private MachineListe wrapper;
 	private MonitoringTask mt;
-	private ConfigEditor editor;
 	
 	
 
-	public Monitor(MachineListe wrapper,ConfigEditor editor) {
+	public Monitor(MachineListe wrapper) {
 		this.wrapper=wrapper;
-		this.editor=editor;
 	}
 
 
@@ -30,7 +27,7 @@ public class Monitor implements Runnable{
 		
 		
 		//Configuration de la connexion
-		if (!API.auth("aurel", "______")){
+		if (!API.auth("aurel", "_______")){
 			System.exit(0);
 		}
 		
@@ -45,11 +42,7 @@ public class Monitor implements Runnable{
 		
 		
 		//On en allume une seule 
-		//TODO j'ai mis l'id en dur pour l'instant, a terme ça pourra être n'importe laquelle
-		API.demarerContainer(231);
-		
-		
-
+		API.demarerContainer(301);
 		
 		//On crée le timer
 		Timer time = new Timer(); 
@@ -58,7 +51,7 @@ public class Monitor implements Runnable{
 		 mt = new MonitoringTask(this); 
 		
 		//On programme la tâche 
-		time.schedule(mt, 5000, 10000); 
+		time.schedule(mt, 30000, 5000); 
 
 		
 		
@@ -69,7 +62,7 @@ public class Monitor implements Runnable{
 		List <Machine> retour = new ArrayList<Machine>();
 		
 		for (VmOpenvz vm: list){
-			if (vm.getVmid() >200){
+			if (vm.getVmid() >300){
 				retour.add(new Machine(vm.getIp(), vm.getVmid(), 
 						vm.getName(),vm.isRunning(),vm.getCpu(),
 						vm.getNetin(),vm.getNetout()));
@@ -92,18 +85,19 @@ public class Monitor implements Runnable{
 
 
 
-	public ConfigEditor getEditor() {
-		return editor;
+
+
+
+	//Meme pas besoin de detecter le fait qu'on est à cours de container ! ça se fera tout seul en refusant les requetes.
+	public void deployNew(){
+		for(Machine m:wrapper.getList()){
+			if (!m.isRunning()){
+				API.demarerContainer(m.getId());
+				return;
+			}
+		}
 	}
-
-
-
-	public void setEditor(ConfigEditor editor) {
-		this.editor = editor;
-	}
-
-
-
+	
 	private void shutdownAll(){
 		for(Machine m :wrapper.getList()){
 			if (m.isRunning()){
@@ -111,29 +105,17 @@ public class Monitor implements Runnable{
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException e) {
-					e.printStackTrace();
+					System.out.println("MONITOR | Error : "+e);
 				}
 			}
 		}
+	
+	}
 
-	}
-	
-	//Meme pas besoin de detecter le fait qu'on est à cours de container ! ça se fera tout seul en refusant les requetes.
-	public void deployNew(){
-		for(Machine m:wrapper.getList()){
-			if (!m.isRunning()){
-				API.demarerContainer(m.getId());
-				try {
-					Thread.sleep(5000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-				return;
-			}
-		}
-	}
-	
+
+
 	public void stop(Machine m){
+		m.setDelete(false);
 		API.arreterContainer(m.getId());
 	}
 	

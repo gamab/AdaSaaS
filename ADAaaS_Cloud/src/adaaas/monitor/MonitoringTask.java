@@ -10,30 +10,27 @@ import proxmox.api.API;
 public class MonitoringTask extends TimerTask {
 	
 	private Monitor monitor;
-	private boolean updateMade;
+	//private boolean updateMade;
 	
 	
 	public MonitoringTask(Monitor monitor){
 		this.monitor=monitor;
-		updateMade =false;
+		//updateMade =true;
 	}
 
 	@Override
 	public synchronized void run() {
-		System.out.println("Salut poto je suis la routine de monitoring");
+		System.out.println("--DEBUT DE LA ROUTINE PERIODIQUE DE MONITORING--");
 		
 		
 		//On travaille avec la nouvelle liste
 		List<Machine> copie = Monitor.containersToMachine(API.recupererContainers());
-		System.out.println("Nouvelle liste");
-		if (updateMade){
-			updateMade=false;
+
 			
 			synchronized(ADAaas.LOCK){
-				System.out.println("Monitor : Je notifie ! ");
+				System.out.println("MONITOR | Notify ");
 				ADAaas.LOCK.notify();
 			}
-		}
 		
 		int nombreMachineEligible = 0;
 		for(Machine m :copie){
@@ -42,20 +39,19 @@ public class MonitoringTask extends TimerTask {
 			}
 			
 			if (m.updateDeletable()){
-				//monitor.stop(m);
+				monitor.stop(m);
 			}
 		}
 		
 		
 		
 		
-		System.out.println("Nombre de machine eligible : "+nombreMachineEligible);
+		System.out.println("MONITOR | Eligible Machines: "+nombreMachineEligible);
 		
 		
-		//TODO ajouter toute la partie suppression ici.
+
 		if (nombreMachineEligible<=1 ){
 			monitor.deployNew();
-			updateMade =true;
 		}
 		
 		
@@ -64,7 +60,7 @@ public class MonitoringTask extends TimerTask {
 	
 		//Mise à jour de la liste
 		monitor.getWrapper().setList(copie);
-		System.out.println("Liste du moniteur");
+		System.out.println("MONITOR | List");
 		for (Machine m:monitor.getWrapper().getList()){
 			System.out.println(m);
 		}

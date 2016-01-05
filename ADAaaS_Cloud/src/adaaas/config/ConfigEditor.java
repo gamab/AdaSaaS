@@ -3,12 +3,9 @@ package adaaas.config;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
-import java.util.List;
 
 import adaaas.ADAaas;
 import adaaas.Machine;
@@ -58,13 +55,12 @@ public class ConfigEditor extends Thread {
 				out.newLine();
 			}
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			System.out.println("copy :"+e.toString());
 		}
 	}
 
 
 	private void addMachinesToConfig(BufferedWriter out){
-		String ligne = "";
 		String chaine2 = "";
 		String reg = ("\\.");
 		String[] ip;
@@ -73,18 +69,18 @@ public class ConfigEditor extends Thread {
 				chaine2 = machine.getIp();
 				ip = chaine2.split(reg);
 				String toWrite = "server " + machine.getName() + " " + machine.getIp()
-				+ ":80 cookie S" + ip[3] + " check ";
+				+ ":8080 cookie S" + ip[3] + " check ";
 				if (! machine.isEligible()) {
 					toWrite += "weight 0";
 				}
-				toWrite += "\n";
+				//toWrite += "\n";
 
 				out.write(toWrite);
 				out.newLine();
 			}
 
 		} catch (Exception e) {
-			System.out.println(e.toString());
+			System.out.println("add : "+e.toString());
 		}
 
 	}
@@ -94,17 +90,17 @@ public class ConfigEditor extends Thread {
 		try {
 			while (true) {
 				//wait to be notified
-				System.out.println("EDITOR : Je m'endors");
+				System.out.println("EDITOR | Sleep");
 				synchronized(ADAaas.LOCK){
 					ADAaas.LOCK.wait();
 				}
 
-				System.out.println("EDITOR : Je me réveille");
+				System.out.println("EDITOR | Wake up");
 				//First get the machines currently running from the list of machines
 				getRunningMachines();
 				//Create the flows
-				BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(path+"/"+"configdeb.txt")));
-				BufferedWriter out = new BufferedWriter(new FileWriter(path+"/"+"config.txt"));
+				BufferedReader in = new BufferedReader(new InputStreamReader(new FileInputStream(path+"/"+"buf")));
+				BufferedWriter out = new BufferedWriter(new FileWriter(path+"/"+"haproxy.cfg"));
 				//Copy the beginning of the config file
 				copyBeginningToConfig(in, out);
 				//Add the machines to the config file
@@ -112,30 +108,27 @@ public class ConfigEditor extends Thread {
 				//close the flows
 				in.close();
 				out.close();
+				
+				
 
+				//Run the script
 				Runtime rt =Runtime.getRuntime();
-				Process proc=rt.exec("ls");
-
+				Process proc=rt.exec(path+"/haproxy_restart");
 				BufferedReader stdInput = new BufferedReader(new 
 						InputStreamReader(proc.getInputStream()));
 
-				// read the output from the command
-				System.out.println("Output of the command:\n");
+				//read the output from the command
+				System.out.println("Output of the command:");
 				String s = null;
 				while ((s = stdInput.readLine()) != null) {
 					System.out.println(s);
 				}
 
 			}
-		}catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+		}catch (Exception e) {
+			System.out.println("Le configEditor a planté. ");
 			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		
 		}
 	}
 
